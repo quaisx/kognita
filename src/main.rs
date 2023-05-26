@@ -1,4 +1,21 @@
-#![warn(deprecated)]
+/*
+ _        _______  _______  _       __________________ _______ 
+| \    /\(  ___  )(  ____ \( (    /|\__   __/\__   __/(  ___  )
+|  \  / /| (   ) || (    \/|  \  ( |   ) (      ) (   | (   ) |
+|  (_/ / | |   | || |      |   \ | |   | |      | |   | (___) |
+|   _ (  | |   | || | ____ | (\ \) |   | |      | |   |  ___  |
+|  ( \ \ | |   | || | \_  )| | \   |   | |      | |   | (   ) |
+|  /  \ \| (___) || (___) || )  \  |___) (___   | |   | )   ( |
+|_/    \/(_______)(_______)|/    )_)\_______/   )_(   |/     \|
+                                                               
+@authors: free thinkers of the world
+    1. Qua Is X (Ukraine) qua.is.kyiv.ua@gmail.com
+    /add your name here.../
+
+ */
+
+#![allow(deprecated)]
+#![allow(unused_imports)]
 use async_std::io;
 use futures::{future::Either, prelude::*, select, StreamExt};
 use libp2p::{
@@ -17,6 +34,14 @@ use rand::Rng;
 use emojis;
 use futures_ticker;
 use lipsum::lipsum;
+use log::{debug, error, info, trace, warn};
+use std::env;
+
+mod utils;
+mod wallet;
+
+extern crate pretty_env_logger;
+#[macro_use] extern crate log;
 
 const HEARTBEAT_INTERVAL: u64 = 15; // gossibsub hb interval in seconds
 const PUBSUB_TOPIC: &str = "kognita/tx";
@@ -30,13 +55,24 @@ struct PeerNetBehaviour {
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let e_rocket = emojis::get_by_shortcode("rocket").unwrap();
+
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        println!("Usage: {} <node-name>", args[0]);
+        return Ok(());
+    }
+    pretty_env_logger::init();
+
+    let node_name = &args[1];
+    info!("{e_rocket}  ~ Running on {node_name}");
     // Let us generate crypto secure keys
     let key_pair = identity::Keypair::generate_ed25519();
     let pub_key = key_pair.public();
     let peer_id = PeerId::from_public_key(&pub_key);
     let e = emojis::get_by_shortcode("identification_card").unwrap();
     let e_warn = emojis::get_by_shortcode("warning").unwrap();
-    println!("{e} PEER ID: {peer_id}");
+    info!("{e} PEER ID: {peer_id}");
 
     // Set up an encrypted DNS-enabled TCP Transport over the yamux protocol.
     let tcp_transport = tcp::async_io::Transport::new(tcp::Config::default().nodelay(true))
@@ -119,7 +155,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         topic.clone(), 
                         payload.as_bytes()) 
                 {
-                    println!("{e_warn} ~ Publish error: {e:?}");
+                    error!("{e_warn} ~ Publish error: {e:?}");
                 }
             },
             // Handle swarm events
@@ -131,7 +167,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     )
                 ) => {
                     for (peer_id, _multiaddr) in list {
-                        println!("mDNS discovered a new peer: {peer_id}");
+                        info!("mDNS discovered a new peer: {peer_id}");
                         swarm.behaviour_mut().gossipsub.add_explicit_peer(&peer_id);
                     }
                 },
@@ -142,7 +178,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 )
             ) => {
                     for (peer_id, _multiaddr) in list {
-                        println!("mDNS discover peer has expired: {peer_id}");
+                        warn!("mDNS discover peer has expired: {peer_id}");
                         swarm.behaviour_mut().gossipsub.remove_explicit_peer(&peer_id);
                     }
                 },
@@ -155,13 +191,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         message,
                     }
                 )
-            ) => println!(
+            ) => info!(
                         "Got message: '{}' with id: {id} from peer: {peer_id}",
                         String::from_utf8_lossy(&message.data),
                     ),
             // New address found event swarm will listen on
             SwarmEvent::NewListenAddr { address, .. } => {
-                println!("Local node is listening on {address}");
+                info!("Local node is listening on {address}");
             }
             _ => {}
             }
