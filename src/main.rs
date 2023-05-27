@@ -20,9 +20,9 @@
 use futures::{future::Either, prelude::*, select, StreamExt};
 use libp2p::{
     core::{muxing::StreamMuxerBox, transport::OrTransport, upgrade},
-    gossipsub, identity, mdns, noise,
+    gossipsub, identity, mdns, noise, ping,
     swarm::NetworkBehaviour,
-    swarm::{SwarmBuilder, SwarmEvent},
+    swarm::{keep_alive, SwarmBuilder, SwarmEvent},
     tcp, tcp::TokioTcpTransport, yamux, quic, PeerId, Transport
 };
 use std::collections::hash_map::DefaultHasher;
@@ -50,6 +50,8 @@ const PUBSUB_TOPIC: &str = "kognita/tx";
 struct PeerNetBehaviour {
     gossipsub: gossipsub::Behaviour, // to handle pubsub events
     mdns: mdns::async_io::Behaviour, // to handle mDSN discovery events
+    ping: ping::Behaviour,
+    keep_alive: keep_alive::Behaviour
 }
 
 #[tokio::main]
@@ -127,7 +129,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Create a Swarm to manage peers and events
     let mut swarm = {
         let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
-        let behaviour = PeerNetBehaviour { gossipsub, mdns };
+        let ping = ping::Behaviour::new(ping::Config::new().with_interval(Duration::from_secs(1)));
+        let behaviour = PeerNetBehaviour { gossipsub, mdns, ping, keep_alive: keep_alive::Behaviour };
         SwarmBuilder::with_async_std_executor(transport, behaviour, peer_id).build()
     };
 

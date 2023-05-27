@@ -1,0 +1,10 @@
+/Users/ki11erc0der/Workspace/kognita/target/debug/deps/io_lifetimes-fa411cb35f307314.rmeta: /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/lib.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/portability.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/traits.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/example_ffi.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/raw.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/views.rs
+
+/Users/ki11erc0der/Workspace/kognita/target/debug/deps/io_lifetimes-fa411cb35f307314.d: /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/lib.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/portability.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/traits.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/example_ffi.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/raw.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/views.rs
+
+/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/lib.rs:
+/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/portability.rs:
+/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/traits.rs:
+/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/example_ffi.rs:
+/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/raw.rs:
+/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/io-lifetimes-1.0.11/src/views.rs:
