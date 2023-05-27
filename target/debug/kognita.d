@@ -1,1 +1,0 @@
-/Users/ki11erc0der/Workspace/kognita/target/debug/kognita: /Users/ki11erc0der/Workspace/kognita/src/main.rs /Users/ki11erc0der/Workspace/kognita/src/utils.rs /Users/ki11erc0der/Workspace/kognita/src/wallet.rs

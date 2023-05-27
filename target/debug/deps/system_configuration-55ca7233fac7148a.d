@@ -1,9 +1,0 @@
-/Users/ki11erc0der/Workspace/kognita/target/debug/deps/system_configuration-55ca7233fac7148a.rmeta: /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/lib.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/dynamic_store.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/network_configuration.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/network_reachability.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/preferences.rs
-
-/Users/ki11erc0der/Workspace/kognita/target/debug/deps/system_configuration-55ca7233fac7148a.d: /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/lib.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/dynamic_store.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/network_configuration.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/network_reachability.rs /Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/preferences.rs
-
-/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/lib.rs:
-/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/dynamic_store.rs:
-/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/network_configuration.rs:
-/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/network_reachability.rs:
-/Users/ki11erc0der/.cargo/registry/src/github.com-1ecc6299db9ec823/system-configuration-0.5.1/src/preferences.rs:
