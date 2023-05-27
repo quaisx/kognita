@@ -7,6 +7,17 @@
     \_|\_\\____/\____\\_/  \|\_/  \_/  \_/ \|                                     
 ```
 
+## DR;TL
+check out kognita https://github.com/quaisx/kognita
+```bash
+cargo build
+cargo run -- node-x
+```
+You will need to launch at least two nodes in separate terminal windows.
+Observe the nodes start talking to each other by publishing and receiving psuedo random messages.
+
+I will be adding support to enable nodes to communicate with each other over the network once I add support for DHT.
+
 ## Introduction
 This is my attempt to write a crypto platform using my previous experience with a variety of crypto projects I have worked on in the past. I have used such programming languages as Python, Go, JavaScript and all these languages have their drawbacks. The biggest three problems I have faced while using these programming languages are:
 1. Performance

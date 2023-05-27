@@ -16,14 +16,14 @@
 
 #![allow(deprecated)]
 #![allow(unused_imports)]
-use async_std::io;
+
 use futures::{future::Either, prelude::*, select, StreamExt};
 use libp2p::{
     core::{muxing::StreamMuxerBox, transport::OrTransport, upgrade},
     gossipsub, identity, mdns, noise,
     swarm::NetworkBehaviour,
     swarm::{SwarmBuilder, SwarmEvent},
-    tcp, yamux, quic, PeerId, Transport,
+    tcp, tcp::TokioTcpTransport, yamux, quic, PeerId, Transport
 };
 use std::collections::hash_map::DefaultHasher;
 use std::error::Error;
@@ -36,7 +36,6 @@ use futures_ticker;
 use lipsum::lipsum;
 use log::{debug, error, info, trace, warn};
 use std::env;
-
 mod utils;
 mod wallet;
 
@@ -53,7 +52,7 @@ struct PeerNetBehaviour {
     mdns: mdns::async_io::Behaviour, // to handle mDSN discovery events
 }
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let e_rocket = emojis::get_by_shortcode("rocket").unwrap();
 
@@ -73,6 +72,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let e = emojis::get_by_shortcode("identification_card").unwrap();
     let e_warn = emojis::get_by_shortcode("warning").unwrap();
     info!("{e} PEER ID: {peer_id}");
+
 
     // Set up an encrypted DNS-enabled TCP Transport over the yamux protocol.
     let tcp_transport = tcp::async_io::Transport::new(tcp::Config::default().nodelay(true))
@@ -130,9 +130,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let behaviour = PeerNetBehaviour { gossipsub, mdns };
         SwarmBuilder::with_async_std_executor(transport, behaviour, peer_id).build()
     };
-
-    // Read user input from stdin - these are msgs we publish
-    let mut _stdin = io::BufReader::new(io::stdin()).lines().fuse();
 
     // Listen on all ipv4 interfaces and ephemeral ports
     swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
