@@ -7,6 +7,9 @@
     \_|\_\\____/\____\\_/  \|\_/  \_/  \_/ \|                                     
 ```
 
+# LATEST UPDATE
+I am working on branch feat/tokio to migrate to tokio async library.
+
 ## Introduction
 This is my attempt to write a crypto platform using my previous experience with a variety of crypto projects I have worked on in the past. I have used such programming languages as Python, Go, JavaScript and all these languages have their drawbacks. The biggest three problems I have faced while using these programming languages are:
 1. Performance
