@@ -8,7 +8,7 @@
 ```
 
 # LATEST UPDATE
-I am working on branch feat/tokio to migrate to tokio async library.
+I am working on branch feat/rendezvous to use rendezvous points.
 
 ## DR;TL
 check out kognita https://github.com/quaisx/kognita
@@ -18,6 +18,8 @@ cargo run -- node-x
 ```
 You will need to launch at least two nodes in separate terminal windows.
 Observe the nodes start talking to each other by publishing and receiving psuedo random messages.
+
+![4 Nodes communicating](design/peers-4-pubsub-x.png)
 
 I will be adding support to enable nodes to communicate with each other over the network once I add support for DHT.
 
