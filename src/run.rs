@@ -17,7 +17,7 @@ use std::time::Duration;
 use std::time::{SystemTime, SystemTimeError};
 use rand::Rng;
 use emojis;
-use futures_ticker;
+// use futures_ticker;
 use lipsum::lipsum;
 use log::{debug, error, info, trace, warn};
 use std::env;
@@ -117,21 +117,23 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
        let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
        let ping = ping::Behaviour::new(ping::Config::new().with_interval(Duration::from_secs(30)));
        let behaviour = PeerNetBehaviour { gossipsub, mdns, ping, keep_alive: keep_alive::Behaviour };
-       SwarmBuilder::with_async_std_executor(transport, behaviour, peer_id).build()
+       SwarmBuilder::with_tokio_executor(transport, behaviour, peer_id).build()
    };
 
    // Listen on all ipv4 interfaces and ephemeral ports
    swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
    swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
 
-   let num = rand::thread_rng().gen_range(1..10);
-   let mut tcr = futures_ticker::Ticker::new_with_next(Duration::from_secs(num), Duration::from_secs(10)).fuse();
+   let num = rand::thread_rng().gen_range(5..10);
+   // let mut tcr = futures_ticker::Ticker::new_with_next(Duration::from_secs(num), Duration::from_secs(10)).fuse();
+
+   let mut tcr = tokio::time::interval(Duration::from_secs(num));
    // Infinite loop
    loop {
        // ---> SELECT EVENT
-       select! {
+       tokio::select! {
            // Handle user input - take input as a txt message and publish to the topic
-           _ = tcr.select_next_some() => {
+           _ = tcr.tick() => {
                let num_words = rand::thread_rng().gen_range(3..15);
                let t = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs();
                let payload = format!("[{t}] - {}", lipsum(num_words));
@@ -202,7 +204,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                    info!("{e_intr}  ~ <NET> Local node is listening on {address}");
                },
                other_event => {
-                   warn!("{e_warn} ~ <UNHANDLED> {:?}", other_event);
+                   warn!("{e_warn}  ~ <UNHANDLED> {:?}", other_event);
                }
 
            }
