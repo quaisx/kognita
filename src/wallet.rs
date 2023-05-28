@@ -25,7 +25,7 @@
      rand::{rngs, SeedableRng},
      PublicKey, SecretKey,
  };
- use tiny_keccak::keccak256; // hashing funcs
+ use tiny_keccak::{Sha3, Hasher}; // hashing funcs
  use web3::types::Address; // H160 -> 20 byte long wallet address
  
  /// ---------------------------------------------------------------------------
@@ -43,7 +43,11 @@
      let pub_key = pub_key.serialize_uncompressed();
  
      debug_assert_eq!(pub_key[0], 0x04);
-     let hash = keccak256(&pub_key[1..]);
+
+    let mut sha3 = Sha3::v256();
+    let mut hash = [0u8; 32];
+    sha3.update(&pub_key[1..]);
+    sha3.finalize(&mut hash);
  
      Address::from_slice(&hash[12..])
  }
@@ -60,7 +64,7 @@
      // prepare a new Scp256k1 context
      let secp = secp256k1::Secp256k1::new();
      // use a true number generator based on CPU jitter (inuque for each chip)
-     let mut rng = rngs::JitterRng::new_with_timer(utils::gen_seed);
+     let mut rng = rngs::StdRng::seed_from_u64(utils::gen_seed());
      // now that we have a real random seed, generate a key pair
      secp.generate_keypair(&mut rng)
  }
@@ -77,7 +81,7 @@
      pub fn new(secret_key: &SecretKey, public_key: &PublicKey) -> Self {
          let addr: Address = pub_key_addr(&public_key);
          Wallet {
-             secret_key: secret_key.to_string(),
+             secret_key: secret_key.display_secret().to_string(),
              public_key: public_key.to_string(),
              public_address: format!("{:?}", addr),
          }

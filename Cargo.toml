@@ -6,9 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-    libp2p = { version = "0.51", features = ["tcp", "quic", "dns", "gossipsub", "mdns", "async-std", "noise", "mplex", "yamux", "websocket", "ping", "macros"] }
+    libp2p = { version = "0.51", features = ["tcp", "tokio", "quic", "async-std", "dns", "gossipsub", "mdns", "noise", "ping", "mplex", "yamux", "websocket", "ping", "macros"] }
     futures = "0.3.28"
     async-std = { version = "1.12.0", features = ["attributes"] }
+    tokio = { version = "1.28.1", features = ["full"] }
     rand = "0.8.5"
     rand_core = { version = "0.6.4", default-features = false }
 
@@ -21,10 +22,12 @@ edition = "2021"
     log = "0.4.17"
     pretty_env_logger = "0.5.0"
     serde = { version = "1.0", features = ["derive"] }
-anyhow = "1.0"
-dotenv = "0.15.0"
-secp256k1 = { version = "0.27.0", features = ["rand"] }
-tokio = { version= "1", features = ["full"] }
-web3 = "0.18.0"
-serde_json = "1.0"
-tiny-keccak = { version = "2.0.2" }
+    anyhow = "1.0"
+    dotenv = "0.15.0"
+    secp256k1 = { version = "0.27.0", features = ["rand"] }
+    web3 = "0.18.0"
+    serde_json = "1.0"
+    tiny-keccak = { version = "2.0.2", features = ["sha3"] }
+    openssl = { version = "0.10", features = ["vendored"] }
+    aes-gcm = "0.10.2"
+
