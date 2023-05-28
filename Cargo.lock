@@ -1907,6 +1907,7 @@ dependencies = [
  "libp2p",
  "lipsum",
  "log",
+ "once_cell",
  "openssl",
  "pretty_env_logger",
  "rand 0.8.5",

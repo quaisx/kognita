@@ -14,9 +14,9 @@
 
  */
 use std::error::Error;
-mod run;
+mod node;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    run::run().await
+    node::run().await
 }

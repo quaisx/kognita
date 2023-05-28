@@ -24,8 +24,9 @@ use std::env;
 
 extern crate pretty_env_logger;
 
+mod config;
 
-const HEARTBEAT_INTERVAL: u64 = 15; // gossibsub hb interval in seconds
+
 const PUBSUB_TOPIC: &str = "kognita/tx";
 
 // Custom Swarm Network behaviors
@@ -38,7 +39,6 @@ struct PeerNetBehaviour {
 }
 
 pub async fn run() -> Result<(), Box<dyn Error>> {
-   let e_rocket = emojis::get_by_shortcode("rocket").unwrap();
 
    let args: Vec<String> = env::args().collect();
    if args.len() < 2 {
@@ -48,19 +48,12 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
    pretty_env_logger::init();
 
    let node_name = &args[1];
-   info!("{e_rocket}  ~ Running on {node_name}");
+   info!("{}  ~ Running on {node_name}", config::E_ROCK.clone());
    // Let us generate crypto secure keys
    let key_pair = identity::Keypair::generate_ed25519();
    let pub_key = key_pair.public();
    let peer_id = PeerId::from_public_key(&pub_key);
-   let e = emojis::get_by_shortcode("identification_card").unwrap();
-   let e_warn = emojis::get_by_shortcode("warning").unwrap();
-   let e_ping = emojis::get_by_shortcode("ping_pong").unwrap();
-   let e_intr = emojis::get_by_shortcode("left_right_arrow").unwrap();
-   let e_disc = emojis::get_by_shortcode("globe_with_meridians").unwrap();
-   let e_event = emojis::get_by_shortcode("incoming_envelope").unwrap();
-   info!("{e} PEER ID: {peer_id}");
-
+   info!("{} PEER ID: {peer_id}", config::E_ID.clone());
 
    // Set up an encrypted DNS-enabled TCP Transport over the yamux protocol.
    let tcp_transport = tcp::async_io::Transport::new(tcp::Config::default().nodelay(true))
@@ -96,7 +89,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 
    // Set a custom gossipsub configuration
    let gossipsub_config = gossipsub::ConfigBuilder::default()
-       .heartbeat_interval(Duration::from_secs(HEARTBEAT_INTERVAL)) // This is set to aid debugging by not cluttering the log space
+       .heartbeat_interval(Duration::from_secs(config::HEARTBEAT_INTERVAL)) // This is set to aid debugging by not cluttering the log space
        .duplicate_cache_time(Duration::from_millis(100))
        .validation_mode(gossipsub::ValidationMode::Strict) // This sets the kind of message validation. The default is Strict (enforce message signing)
        .message_id_fn(message_id_fn) // content-address messages. No two messages of the same content will be propagated.
@@ -115,7 +108,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
    // Create a Swarm to manage peers and events
    let mut swarm = {
        let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
-       let ping = ping::Behaviour::new(ping::Config::new().with_interval(Duration::from_secs(30)));
+       let ping = ping::Behaviour::new(ping::Config::new().with_interval(Duration::from_secs(config::PING_INTERVAL)));
        let behaviour = PeerNetBehaviour { gossipsub, mdns, ping, keep_alive: keep_alive::Behaviour };
        SwarmBuilder::with_tokio_executor(transport, behaviour, peer_id).build()
    };
@@ -143,7 +136,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                        topic.clone(), 
                        payload.as_bytes()) 
                {
-                   error!("{e_warn}  ~ <PUBLISH> error: {e:?}");
+                   error!("{}  ~ <PUBLISH> error: {e:?}", &config::E_WARN.clone());
                }
            },
            // Handle swarm events
@@ -154,7 +147,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                            peer,
                            ..
                })) if peer != peer_id => {
-                   info!("{e_ping}  ~ <PING> to {} ", peer);
+                   info!("{}  ~ <PING> to {} ", &config::E_PING.clone(), peer);
                },
                // mDNS discovery event
                SwarmEvent::Behaviour(
@@ -163,7 +156,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                    )
                ) => {
                    for (peer_id, _multiaddr) in list {
-                       info!("{e_disc}  ~ <mDNS> discovered a new peer: {peer_id}");
+                       info!("{}  ~ <mDNS> discovered a new peer: {peer_id}", &config::E_DISC.clone());
                        swarm.behaviour_mut().gossipsub.add_explicit_peer(&peer_id);
                    }
                },
@@ -174,7 +167,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                    )
                ) => {
                    for (peer_id, _multiaddr) in list {
-                       warn!("{e_warn}  ~ <mDNS> discover peer has expired: {peer_id}");
+                       warn!("{}  ~ <mDNS> discover peer has expired: {peer_id}", config::E_WARN.clone());
                        swarm.behaviour_mut().gossipsub.remove_explicit_peer(&peer_id);
                    }
                },
@@ -184,7 +177,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                      gossipsub::Event::Subscribed { peer_id, topic }
                   )
                ) => info!(
-                  "{e_event} ~ <SUBSCRIBE> {peer_id} subscribed to {topic}"
+                  "{} ~ <SUBSCRIBE> {peer_id} subscribed to {topic}", config::E_EVT.clone()
                ),
                // incoming sub event
                SwarmEvent::Behaviour(
@@ -196,15 +189,18 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                        }
                    )
                ) => info!(
-                       "{e_event}  ~ <MESSAGE>: '{}' with id: {id} from peer: {peer_id}",
+                       "{}  ~ <MESSAGE>: '{}' with id: {id} from peer: {peer_id}", 
+                       config::E_EVT.clone(),
                        String::from_utf8_lossy(&message.data),
                    ),
                // New address found event swarm will listen on
                SwarmEvent::NewListenAddr { address, .. } => {
-                   info!("{e_intr}  ~ <NET> Local node is listening on {address}");
+                   info!("{}  ~ <NET> Local node is listening on {address}",
+                    config::E_INTR.clone(),
+                );
                },
                other_event => {
-                   warn!("{e_warn}  ~ <UNHANDLED> {:?}", other_event);
+                   warn!("{}  ~ <UNHANDLED> {:?}", config::E_EVT.clone(), other_event);
                }
 
            }
