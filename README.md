@@ -1,4 +1,4 @@
-#PROJECT
+# PROJECT
 ```code
      _  __ ____  _____ _      _  _____  ____ 
     / |/ //  _ \/  __// \  /|/ \/__ __\/  _ \
@@ -6,6 +6,9 @@
     |   \ | \_/|| |_//| | \||| |  | |  | |-||
     \_|\_\\____/\____\\_/  \|\_/  \_/  \_/ \|                                     
 ```
+
+# LATEST UPDATE
+I am working on branch feat/tokio to migrate to tokio async library.
 
 ## DR;TL
 check out kognita https://github.com/quaisx/kognita
