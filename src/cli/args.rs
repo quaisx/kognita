@@ -14,14 +14,21 @@
 
  */
 
-use std::error::Error;
-mod node;
-mod cli;
-use cli::args::parse_args;
-use node::run;
+use clap::Parser;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    let args = parse_args();   
-    run::run(&args).await
+#[derive(Parser)]
+#[command(name = "Kognita")]
+#[command(author = "Qua Is X")]
+#[command(version = "1.0")]
+#[command(
+    about = "Kognita crypto platform", 
+    long_about = "Kognita is an open source project implemented in Rust"
+)]
+pub struct NodeCliArgs {
+    #[arg(long)]
+    pub node: String,
+}
+
+pub fn parse_args() -> NodeCliArgs {
+   NodeCliArgs::parse()
 }

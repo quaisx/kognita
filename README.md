@@ -14,7 +14,7 @@ I am working on branch feat/rendezvous to use rendezvous points.
 check out kognita https://github.com/quaisx/kognita
 ```bash
 cargo build
-cargo run -- node-x
+cargo run -- --node node-x
 ```
 You will need to launch at least two nodes in separate terminal windows.
 Observe the nodes start talking to each other by publishing and receiving psuedo random messages.

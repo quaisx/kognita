@@ -37,10 +37,9 @@ use lipsum::lipsum;
 use log::{debug, error, info, trace, warn};
 use std::env;
 
+use super::super::cli::args::NodeCliArgs as NodeCliArgs;
+use super::config;
 extern crate pretty_env_logger;
-
-mod config;
-
 
 const PUBSUB_TOPIC: &str = "kognita/tx";
 
@@ -54,22 +53,17 @@ struct PeerNetBehaviour {
     keep_alive: keep_alive::Behaviour
 }
 
-pub async fn run() -> Result<(), Box<dyn Error>> {
+pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
 
-   let args: Vec<String> = env::args().collect();
-   if args.len() < 2 {
-       println!("Usage: {} <node-name>", args[0]);
-       return Ok(());
-   }
    pretty_env_logger::init();
 
-   let node_name = &args[1];
+   let node_name = &args.node;
    info!("{}  ~ Running on {node_name}", config::E_ROCK.clone());
    // Let us generate crypto secure keys
    let key_pair = identity::Keypair::generate_ed25519();
    let pub_key = key_pair.public();
    let peer_id = PeerId::from_public_key(&pub_key);
-   info!("{} PEER ID: {peer_id}", config::E_ID.clone());
+   info!("{}  ~ {} Id: {}", config::E_ID.clone(), &node_name, &peer_id);
 
    // Set up an encrypted DNS-enabled TCP Transport over the yamux protocol.
    let tcp_transport = tcp::async_io::Transport::new(tcp::Config::default().nodelay(true))
@@ -221,8 +215,10 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                    ),
                // New address found event swarm will listen on
                SwarmEvent::NewListenAddr { address, .. } => {
-                   info!("{}  ~ <NET> Local node is listening on {address}",
+                   info!("{}  ~ <NET> [{}]:{} is listening on {address}",
                     config::E_INTR.clone(),
+                    &node_name,
+                    &peer_id
                 );
                },
                SwarmEvent::ConnectionEstablished { peer_id, endpoint, .. } => {
