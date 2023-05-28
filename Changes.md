@@ -7,3 +7,6 @@ May 26 - add some utility functions for random seeding and a crypto wallet.
 
 May 26 - start using tokio async; gradual switch;
     - update wallet to use updated crate functions for key generation
+
+May 27 - replace asyc_std with tokio
+
