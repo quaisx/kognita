@@ -20,7 +20,7 @@
 use futures::{future::Either, prelude::*, select, StreamExt};
 use libp2p::{
     core::{muxing::StreamMuxerBox, transport::OrTransport, upgrade},
-    gossipsub, identity, mdns, noise, ping,
+    gossipsub, identity, identify, mdns, mdns::Mdns, noise, ping,
     swarm::NetworkBehaviour,
     swarm::{keep_alive, SwarmBuilder, SwarmEvent},
     tcp, tcp::TokioTcpTransport, yamux, quic, PeerId, Transport
@@ -47,8 +47,9 @@ const PUBSUB_TOPIC: &str = "kognita/tx";
 // Custom Swarm Network behaviors
 #[derive(NetworkBehaviour)]
 struct PeerNetBehaviour {
+    identify: identify::Behaviour,
     gossipsub: gossipsub::Behaviour, // to handle pubsub events
-    mdns: mdns::async_io::Behaviour, // to handle mDSN discovery events
+    mdns: libp2p::mdns::tokio::Behaviour, // to handle mDSN discovery events
     ping: ping::Behaviour,
     keep_alive: keep_alive::Behaviour
 }
@@ -112,7 +113,7 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 
    // build a gossipsub network behaviour
    let mut gossipsub = gossipsub::Behaviour::new(
-       gossipsub::MessageAuthenticity::Signed(key_pair),
+       gossipsub::MessageAuthenticity::Signed(key_pair.clone()),
        gossipsub_config,
    )?;
    // Create a Gossipsub topic
@@ -122,9 +123,19 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
 
    // Create a Swarm to manage peers and events
    let mut swarm = {
-       let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
-       let ping = ping::Behaviour::new(ping::Config::new().with_interval(Duration::from_secs(config::PING_INTERVAL)));
-       let behaviour = PeerNetBehaviour { gossipsub, mdns, ping, keep_alive: keep_alive::Behaviour };
+        //let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
+        let mut mdns_config = libp2p::mdns::Config::default();
+        mdns_config.query_interval = Duration::from_secs(15);
+        mdns_config.ttl = Duration::from_secs(15);
+        let mdns = libp2p::mdns::tokio::Behaviour::new(mdns_config, peer_id)?;
+        let ping = ping::Behaviour::new(ping::Config::new().with_interval(Duration::from_secs(config::PING_INTERVAL)));
+        let identify = identify::Behaviour::new(
+            identify::Config::new(
+                config::STR_RENDEZVOUS_POINT.to_string(),
+                key_pair.public(),
+            )
+        );
+       let behaviour = PeerNetBehaviour { identify, gossipsub, mdns, ping, keep_alive: keep_alive::Behaviour };
        SwarmBuilder::with_tokio_executor(transport, behaviour, peer_id).build()
    };
 
@@ -214,6 +225,21 @@ pub async fn run() -> Result<(), Box<dyn Error>> {
                     config::E_INTR.clone(),
                 );
                },
+               SwarmEvent::ConnectionEstablished { peer_id, endpoint, .. } => {
+                log::info!("{}  ~ <NET> Connected to {}:{}", config::E_PLUG.clone(), peer_id, endpoint.get_remote_address());
+                },
+                SwarmEvent::ConnectionClosed { peer_id, endpoint, .. } => {
+                    log::info!("{}  ~ <NET> Disconnected from {peer_id}:{}", config::E_PLUG.clone(), endpoint.get_remote_address());
+                },
+                SwarmEvent::IncomingConnection {
+                    local_addr, send_back_addr
+                } => {
+                    info!("{}  ~ <NET> Incoming Connection from {}->{}", 
+                        config::E_PLUG.clone(),
+                        send_back_addr,
+                        local_addr
+                    );
+                }
                other_event => {
                    warn!("{}  ~ <UNHANDLED> {:?}", config::E_EVT.clone(), other_event);
                }
