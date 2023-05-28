@@ -14,14 +14,5 @@
 
  */
 
-use std::error::Error;
-mod node;
-mod cli;
-use cli::args::parse_args;
-use node::run;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    let args = parse_args();   
-    run::run(&args).await
-}
+pub mod run;
+pub mod config;
