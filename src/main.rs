@@ -17,11 +17,12 @@
 use std::error::Error;
 mod node;
 mod cli;
-use cli::args::parse_args;
+use cli::args::parse_cli;
 use node::run;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let args = parse_args();   
+    let args = parse_cli();
+    println!("<ARGS> {args}"); 
     run::run(&args).await
 }

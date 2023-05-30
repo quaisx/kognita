@@ -19,7 +19,12 @@
 
 use futures::{future::Either, prelude::*, select, StreamExt};
 use libp2p::{
-    core::{muxing::StreamMuxerBox, transport::OrTransport, upgrade},
+    core::{
+        muxing::StreamMuxerBox, 
+        transport::OrTransport, 
+        upgrade,
+        multiaddr::{Multiaddr, Protocol},
+    },
     gossipsub, identity, identify, mdns, mdns::Mdns, noise, ping,
     swarm::NetworkBehaviour,
     swarm::{keep_alive, SwarmBuilder, SwarmEvent},
@@ -37,7 +42,9 @@ use lipsum::lipsum;
 use log::{debug, error, info, trace, warn};
 use std::env;
 
+
 use super::super::cli::args::NodeCliArgs as NodeCliArgs;
+use super::super::cli::args::Mode as Mode;
 use super::config;
 extern crate pretty_env_logger;
 
@@ -133,10 +140,32 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
        SwarmBuilder::with_tokio_executor(transport, behaviour, peer_id).build()
    };
 
-   // Listen on all ipv4 interfaces and ephemeral ports
-   swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
-   swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
-
+   match args.mode {
+    Mode::Server => {
+        // Listen on all ipv4 interfaces and ephemeral ports
+        swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
+        swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+    },
+    Mode::Client => {
+        if let Some(srv_addr) = &args.server_address {
+            let mut prot_stack = srv_addr.protocol_stack();
+            let ma: Multiaddr;
+            _ = prot_stack.next();
+            match prot_stack.next() {
+                Some(x) => {
+                    match x {
+                        "udp" => {
+                            ma = srv_addr.clone().with(Protocol::QuicV1);
+                        },
+                        _ => {ma = srv_addr.clone()}
+                    }
+                },
+                _ => { panic!("failed to format server address") }
+            }
+            swarm.dial(ma).unwrap();
+        }         
+    },
+   }
    let num = rand::thread_rng().gen_range(5..10);
    // let mut tcr = futures_ticker::Ticker::new_with_next(Duration::from_secs(num), Duration::from_secs(10)).fuse();
 
