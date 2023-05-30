@@ -14,8 +14,15 @@ I am working on branch feat/rendezvous to use rendezvous points.
 check out kognita https://github.com/quaisx/kognita
 ```bash
 cargo build
-cargo run -- --node node-x
+cargo run -- <node_name> [client --server_address <ADDR> | server]
 ```
+Nodes can run in two modes: __server__ and __client__
+
+When the node runs in __server__ mode, it only listens for incoming connections from the client nodes. The server nodes are so called bootstrapping nodes.
+
+When the node runs in __client__ mode, it initiates a connection to the server node. This connection allows the bootstrapping process to propagate the routing table information across the network so that the client node can efficiently participate in the network.
+
+Majority of the nodes in the network will be __client__ nodes.
 You will need to launch at least two nodes in separate terminal windows.
 Observe the nodes start talking to each other by publishing and receiving psuedo random messages.
 

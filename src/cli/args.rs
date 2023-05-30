@@ -43,6 +43,7 @@ pub struct NodeCliArgs {
     pub mode: Mode,
     pub server_address: Option<Multiaddr>,
     pub debug: u8,
+    pub port: u16
 }
 impl Display for NodeCliArgs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -56,8 +57,8 @@ impl Display for NodeCliArgs {
             Mode::Server => { srv_msg = "n/a".to_string()}
         }
         write!(f, 
-        "node:{}, mode:{}, server_address:{}, debug:{}"
-        , self.node, self.mode, srv_msg, self.debug
+        "node:{}, port:{} mode:{}, server_address:{}, debug:{}"
+        , self.node, self.port, self.mode, srv_msg, self.debug
         )
     }
 }
@@ -103,8 +104,16 @@ pub fn parse_cli() -> NodeCliArgs {
             .required(false)
             .value_parser(value_parser!(PathBuf)),
         )
-        .arg(arg!(
-            -d --debug ... "Enable debug level logs"
+        .arg(
+            arg!(
+                -p --port <PORT>)
+                .value_parser(value_parser!(u16))
+                .default_value("0")
+                .required(false),
+        )
+        .arg(
+            arg!(
+                -d --debug ... "Enable debug level logs"
         ))
         .subcommand(
             Command::new("client")
@@ -125,14 +134,12 @@ pub fn parse_cli() -> NodeCliArgs {
     let mut _node: String = String::from("");
     // You can check the value provided by positional arguments, or option arguments
     if let Some(node) = matches.get_one::<String>("node") {
-        println!("Node name: {node}");
         _node = node.clone();
     } else {
         panic!("Node name must be provided");
     }
     let _config_path: PathBuf;
     if let Some(config_path) = matches.get_one::<PathBuf>("config") {
-        println!("Config file to use: {}", config_path.display());
         _config_path = config_path.clone();
     }
     let _debug: u8;
@@ -141,19 +148,15 @@ pub fn parse_cli() -> NodeCliArgs {
         .expect("Count's are defaulted")
     {
         0 => { 
-            println!("Debug mode is off");
             _debug = 0;
         },
         1 => {
-            println!("Debug mode is on");
             _debug = 1;
         },
         2 => { 
-            println!("Trace mode is on");
             _debug = 2;
         },
         _ => {
-            println!("Trace mode is on");
             _debug = 2;
         },
     }
@@ -163,7 +166,6 @@ pub fn parse_cli() -> NodeCliArgs {
     if let Some(matches) = matches.subcommand_matches("client") {
         _mode = Mode::Client;
         if let Some(server_addr) = matches.get_one::<String>("server_address") {
-            println!("Printing testing lists...{server_addr}");
             _srv_addr = Multiaddr::from_str(&server_addr).expect("Server address must be a valid multiaddress");
             _server_address = Some(_srv_addr);
         }
@@ -172,5 +174,18 @@ pub fn parse_cli() -> NodeCliArgs {
     if let Some(_) = matches.subcommand_matches("server") {
         _mode = Mode::Server;
     }
-    NodeCliArgs { node: _node, mode: _mode, server_address: _server_address, debug: _debug }
+
+    let mut _port: u16 = 0;
+    if let Some(port) = matches.get_one::<u16>("port") {
+        _port = *port;
+    }
+
+    NodeCliArgs { 
+        node: _node, 
+        mode: _mode, 
+        server_address: 
+        _server_address, 
+        debug: _debug, 
+        port: _port 
+    }
 }
