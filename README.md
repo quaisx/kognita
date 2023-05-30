@@ -8,7 +8,8 @@
 ```
 
 # LATEST UPDATE
-I am working on branch feat/rendezvous to use rendezvous points.
+I am working on branch feat/bootstrap to deploy and use bootstrap nodes.
+I am working on branch feat/baremetal to run kognita nodes on bare metal Raspberry Pi.
 
 ## DR;TL
 check out kognita https://github.com/quaisx/kognita
