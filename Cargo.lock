@@ -2085,6 +2085,7 @@ dependencies = [
  "libp2p-gossipsub",
  "libp2p-identify",
  "libp2p-identity",
+ "libp2p-kad",
  "libp2p-mdns",
  "libp2p-metrics",
  "libp2p-mplex",
@@ -2240,6 +2241,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "libp2p-kad"
+version = "0.43.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39d5ef876a2b2323d63c258e63c2f8e36f205fe5a11f0b3095d59635650790ff"
+dependencies = [
+ "arrayvec",
+ "asynchronous-codec",
+ "bytes",
+ "either",
+ "fnv",
+ "futures",
+ "futures-timer",
+ "instant",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-swarm",
+ "log",
+ "quick-protobuf",
+ "rand 0.8.5",
+ "sha2 0.10.6",
+ "smallvec",
+ "thiserror",
+ "uint",
+ "unsigned-varint",
+ "void",
+]
+
+[[package]]
 name = "libp2p-mdns"
 version = "0.43.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2270,6 +2299,7 @@ dependencies = [
  "libp2p-core",
  "libp2p-gossipsub",
  "libp2p-identify",
+ "libp2p-kad",
  "libp2p-ping",
  "libp2p-swarm",
  "prometheus-client",

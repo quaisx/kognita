@@ -14,9 +14,11 @@ I am working on branch feat/rendezvous to use rendezvous points.
 check out kognita https://github.com/quaisx/kognita
 ```bash
 cargo build
-cargo run -- <node_name> [client --server_address <ADDR> | server]
+cargo run -- <node_name> --port <PORT> [client --server_address <ADDR> | server]
 ```
 Nodes can run in two modes: __server__ and __client__
+
+Server address must be in the format: /ip4/<ip4 address>/tcp/<port>
 
 When the node runs in __server__ mode, it only listens for incoming connections from the client nodes. The server nodes are so called bootstrapping nodes.
 

@@ -1,5 +1,5 @@
 /*
- _        _______  _______  _       __________________ _______ 
+ _        _______  _______  _       __________________ _______
 | \    /\(  ___  )(  ____ \( (    /|\__   __/\__   __/(  ___  )
 |  \  / /| (   ) || (    \/|  \  ( |   ) (      ) (   | (   ) |
 |  (_/ / | |   | || |      |   \ | |   | |      | |   | (___) |
@@ -7,35 +7,28 @@
 |  ( \ \ | |   | || | \_  )| | \   |   | |      | |   | (   ) |
 |  /  \ \| (___) || (___) || )  \  |___) (___   | |   | )   ( |
 |_/    \/(_______)(_______)|/    )_)\_______/   )_(   |/     \|
-                                                               
+
 @authors: free thinkers of the world
     1. Qua Is X (Ukraine) qua.is.kyiv.ua@gmail.com
     /add your name here.../
 
  */
 
- #![allow(unused_imports)]
- #![allow(dead_code)]
-use std::path::PathBuf;
-use std::fmt::Display;
-use clap::{command, arg, Command, value_parser, Parser, ArgAction};
+#![allow(unused_imports)]
+#![allow(dead_code)]
+use clap::{arg, command, value_parser, ArgAction, Command, Parser};
+use libp2p::core::multiaddr::{Multiaddr, Protocol};
 use serde::de::value;
+use std::fmt::Display;
+use std::path::PathBuf;
 use std::str::FromStr;
-use libp2p::{
-    core::{
-        multiaddr::{
-            Multiaddr, 
-            Protocol
-        }
-    }
-};
 
 #[derive(Debug, Parser)]
 #[command(name = "Kognita")]
 #[command(author = "Qua Is X")]
 #[command(version = "1.0")]
 #[command(
-    about = "Kognita crypto platform", 
+    about = "Kognita crypto platform",
     long_about = "Kognita is an open source project implemented in Rust"
 )]
 pub struct NodeCliArgs {
@@ -43,22 +36,23 @@ pub struct NodeCliArgs {
     pub mode: Mode,
     pub server_address: Option<Multiaddr>,
     pub debug: u8,
-    pub port: u16
+    pub port: u16,
 }
 impl Display for NodeCliArgs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut srv_msg: String = "<invalid>".to_string();
         match self.mode {
-            Mode::Client => { 
+            Mode::Client => {
                 if let Some(a) = &self.server_address {
                     srv_msg = a.to_string();
                 }
             }
-            Mode::Server => { srv_msg = "n/a".to_string()}
+            Mode::Server => srv_msg = "n/a".to_string(),
         }
-        write!(f, 
-        "node:{}, port:{} mode:{}, server_address:{}, debug:{}"
-        , self.node, self.port, self.mode, srv_msg, self.debug
+        write!(
+            f,
+            "node:{}, port:{} mode:{}, server_address:{}, debug:{}",
+            self.node, self.port, self.mode, srv_msg, self.debug
         )
     }
 }
@@ -70,10 +64,14 @@ pub enum Mode {
 }
 
 impl Display for Mode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result  {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Mode::Client => { write!(f, "client") }
-            Mode::Server => { write!(f, "server") }
+            Mode::Client => {
+                write!(f, "client")
+            }
+            Mode::Server => {
+                write!(f, "server")
+            }
         }
     }
 }
@@ -90,7 +88,7 @@ impl FromStr for Mode {
 }
 
 pub fn parse_args() -> NodeCliArgs {
-   NodeCliArgs::parse()
+    NodeCliArgs::parse()
 }
 
 pub fn parse_cli() -> NodeCliArgs {
@@ -107,29 +105,25 @@ pub fn parse_cli() -> NodeCliArgs {
         .arg(
             arg!(
                 -p --port <PORT>)
-                .value_parser(value_parser!(u16))
-                .default_value("0")
-                .required(false),
+            .value_parser(value_parser!(u16))
+            .default_value("0")
+            .required(false),
         )
-        .arg(
-            arg!(
+        .arg(arg!(
                 -d --debug ... "Enable debug level logs"
         ))
         .subcommand(
             Command::new("client")
                 .about("run this node as a client")
                 .arg(
-                    arg!(
-                        -s --server_address <SRV_ADDR> "multi-address of a node that runs as a server"
-                    )
-                    .required(true)
-                    .value_parser(value_parser!(String))
+                arg!(
+                    -s --server_address <SRV_ADDR> "multi-address of a node that runs as a server"
                 )
+                .required(true)
+                .value_parser(value_parser!(String)),
+            ),
         )
-        .subcommand(
-            Command::new("server")
-            .about("run this node as a server")
-        )
+        .subcommand(Command::new("server").about("run this node as a server"))
         .get_matches();
     let mut _node: String = String::from("");
     // You can check the value provided by positional arguments, or option arguments
@@ -147,18 +141,18 @@ pub fn parse_cli() -> NodeCliArgs {
         .get_one::<u8>("debug")
         .expect("Count's are defaulted")
     {
-        0 => { 
+        0 => {
             _debug = 0;
-        },
+        }
         1 => {
             _debug = 1;
-        },
-        2 => { 
+        }
+        2 => {
             _debug = 2;
-        },
+        }
         _ => {
             _debug = 2;
-        },
+        }
     }
     let mut _mode: Mode = Mode::Client;
     let mut _srv_addr: Multiaddr = Multiaddr::empty();
@@ -166,7 +160,8 @@ pub fn parse_cli() -> NodeCliArgs {
     if let Some(matches) = matches.subcommand_matches("client") {
         _mode = Mode::Client;
         if let Some(server_addr) = matches.get_one::<String>("server_address") {
-            _srv_addr = Multiaddr::from_str(&server_addr).expect("Server address must be a valid multiaddress");
+            _srv_addr = Multiaddr::from_str(&server_addr)
+                .expect("Server address must be a valid multiaddress");
             _server_address = Some(_srv_addr);
         }
     }
@@ -180,12 +175,11 @@ pub fn parse_cli() -> NodeCliArgs {
         _port = *port;
     }
 
-    NodeCliArgs { 
-        node: _node, 
-        mode: _mode, 
-        server_address: 
-        _server_address, 
-        debug: _debug, 
-        port: _port 
+    NodeCliArgs {
+        node: _node,
+        mode: _mode,
+        server_address: _server_address,
+        debug: _debug,
+        port: _port,
     }
 }

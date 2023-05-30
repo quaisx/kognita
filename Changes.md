@@ -15,5 +15,7 @@ May 28 - add rendezvous discovery; use mdns tokio for mdns discovery;
 
 May 29 - cli args with clap;
 
+May 3- add Kademlia DHT support;
+
 
 
