@@ -13,5 +13,7 @@ May 27 - replace asyc_std with tokio
 May 28 - add rendezvous discovery; use mdns tokio for mdns discovery;
     introduce clap cli argument parsing; reorganize into modules;
 
+May 29 - cli args with clap;
+
 
 
