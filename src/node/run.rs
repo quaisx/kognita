@@ -31,7 +31,9 @@ use libp2p::{
     },
     gossipsub, identify, identity, mdns,
     mdns::Mdns,
-    noise, ping, quic,
+    noise, 
+    ping, ping::Success, 
+    quic,
     swarm::NetworkBehaviour,
     swarm::{keep_alive, SwarmBuilder, SwarmEvent},
     tcp,
@@ -180,7 +182,7 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                         panic!("failed to format server address")
                     }
                 }
-                
+
                 swarm.dial(ma).unwrap();
             }
         }
@@ -223,8 +225,8 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                         mdns::Event::Discovered(list)
                     )
                 ) => {
-                    for (peer_id, _multiaddr) in list {
-                        info!("{}  ~ <mDNS> discovered a new peer: {peer_id}", &config::E_DISC.clone());
+                    for (peer_id, ma) in list {
+                        info!("{}  ~ <mDNS> discovered a new peer: {peer_id}:{ma}", &config::E_DISC.clone());
                         swarm.behaviour_mut().gossipsub.add_explicit_peer(&peer_id);
                     }
                 },
@@ -284,6 +286,17 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                          local_addr
                      );
                  },
+                 SwarmEvent::IncomingConnectionError {
+                    local_addr, send_back_addr, error
+                 } => {
+                    error!(
+                        "{}  ~ <NET> Connection {} -> {} error: {error}",
+                        config::E_ERR.clone(),
+                        send_back_addr,
+                        local_addr,
+                        error = error
+                    );
+                 },
                  SwarmEvent::Behaviour(
                      PeerNetBehaviourEvent::Kad (
                          kad::KademliaEvent::OutboundQueryProgressed {
@@ -308,6 +321,24 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                              }
                          }
                      };
+                 },
+                 SwarmEvent::Behaviour(
+                     PeerNetBehaviourEvent::Ping (
+                         ping::Event {
+                            peer, result
+                         }
+                     )
+                 ) => {
+                    if let Ok(x) = result {
+                        match x {
+                            Success::Pong => {
+                                info!("{}  ~ <PING RCVD> {peer} is alive", config::E_PING.clone());
+                            },
+                            _ => {
+                                info!("{}  ~ <PING SENT> {peer}", config::E_PING.clone());
+                            },
+                        }
+                    }                   
                  },
                  other_event => {
                     warn!("{}  ~ <UNHANDLED> {:#?}", config::E_EVT.clone(), other_event);
