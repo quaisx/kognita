@@ -143,8 +143,8 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
    match args.mode {
     Mode::Server => {
         // Listen on all ipv4 interfaces and ephemeral ports
-        swarm.listen_on("/ip4/0.0.0.0/udp/0/quic-v1".parse()?)?;
-        swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+        swarm.listen_on(format!("/ip4/0.0.0.0/udp/{}/quic-v1", args.port).parse()?)?;
+        swarm.listen_on(format!("/ip4/0.0.0.0/tcp/{}", args.port).parse()?)?;
     },
     Mode::Client => {
         if let Some(srv_addr) = &args.server_address {
@@ -241,7 +241,7 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                        "{}  ~ <MESSAGE>: '{}' with id: {id} from peer: {peer_id}", 
                        config::E_EVT.clone(),
                        String::from_utf8_lossy(&message.data),
-                   ),
+                ),
                // New address found event swarm will listen on
                SwarmEvent::NewListenAddr { address, .. } => {
                    info!("{}  ~ <NET> [{}]:{} is listening on {address}",
@@ -264,9 +264,9 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                         send_back_addr,
                         local_addr
                     );
-                }
-               other_event => {
-                   warn!("{}  ~ <UNHANDLED> {:?}", config::E_EVT.clone(), other_event);
+                },
+                other_event => {
+                   warn!("{}  ~ <UNHANDLED> {:#?}", config::E_EVT.clone(), other_event);
                }
 
            }
