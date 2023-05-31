@@ -34,9 +34,9 @@ use std::str::FromStr;
 pub struct NodeCliArgs {
     pub node: String,
     pub mode: Mode,
-    pub server_address: Option<Multiaddr>,
+    pub server_address: Option<Vec<Multiaddr>>,
     pub debug: u8,
-    pub port: u16,
+    pub port: Option<u16>,
 }
 impl Display for NodeCliArgs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -44,16 +44,34 @@ impl Display for NodeCliArgs {
         match self.mode {
             Mode::Client => {
                 if let Some(a) = &self.server_address {
-                    srv_msg = a.to_string();
+                    for x in a {
+                        srv_msg.push_str(&x.to_string());
+                        srv_msg.push_str(" ");
+                    }
                 }
             }
             Mode::Server => srv_msg = "n/a".to_string(),
         }
-        write!(
-            f,
-            "node:{}, port:{} mode:{}, server_address:{}, debug:{}",
-            self.node, self.port, self.mode, srv_msg, self.debug
-        )
+        let mut port: u16 = 0;
+        if let Some(p) = self.port {
+                    port = p;
+        }
+        match self.mode {
+            Mode::Client => {
+                write!(
+                    f,
+                    "node:{}, mode:{}, server_address:{}, debug:{}",
+                    self.node, self.mode, srv_msg, self.debug
+                )
+            }
+            Mode::Server => {
+                write!(
+                    f,
+                    "node:{}, mode:{}, port:{}, debug:{}",
+                    self.node, self.mode, port, self.debug
+                )
+            }
+        }
     }
 }
 
@@ -102,13 +120,6 @@ pub fn parse_cli() -> NodeCliArgs {
             .required(false)
             .value_parser(value_parser!(PathBuf)),
         )
-        .arg(
-            arg!(
-                -p --port <PORT>)
-            .value_parser(value_parser!(u16))
-            .default_value("0")
-            .required(false),
-        )
         .arg(arg!(
                 -d --debug ... "Enable debug level logs"
         ))
@@ -116,14 +127,24 @@ pub fn parse_cli() -> NodeCliArgs {
             Command::new("client")
                 .about("run this node as a client")
                 .arg(
-                arg!(
-                    -s --server_address <SRV_ADDR> "multi-address of a node that runs as a server"
-                )
+                    arg!(
+                        -s --server_address <SRV_ADDR> "multi-address of a node that runs as a server"
+                    )
                 .required(true)
                 .value_parser(value_parser!(String)),
             ),
         )
-        .subcommand(Command::new("server").about("run this node as a server"))
+        .subcommand(
+            Command::new("server")
+            .about("run this node as a server")
+            .arg(
+                arg!(
+                    -p --port <PORT>)
+                .value_parser(value_parser!(u16))
+                .default_value("0")
+                .required(false),
+            )
+        )
         .get_matches();
     let mut _node: String = String::from("");
     // You can check the value provided by positional arguments, or option arguments
@@ -155,30 +176,35 @@ pub fn parse_cli() -> NodeCliArgs {
         }
     }
     let mut _mode: Mode = Mode::Client;
-    let mut _srv_addr: Multiaddr = Multiaddr::empty();
-    let mut _server_address: Option<Multiaddr> = None;
-    if let Some(matches) = matches.subcommand_matches("client") {
+    let mut _server_addresses: Option<Vec<Multiaddr>> = None;
+    if let Some(sub_matches) = matches.subcommand_matches("client") {
         _mode = Mode::Client;
-        if let Some(server_addr) = matches.get_one::<String>("server_address") {
-            _srv_addr = Multiaddr::from_str(&server_addr)
-                .expect("Server address must be a valid multiaddress");
-            _server_address = Some(_srv_addr);
+        if let Some(server_addrs) = sub_matches.get_one::<String>("server_address") {
+            let mut addrs = vec![];
+            for addr in server_addrs.trim().split(",") {
+                let r = Multiaddr::from_str(&addr);
+                if r.is_ok() {
+                    addrs.push(r.unwrap());
+                }
+            }
+            if addrs.len() > 0 {
+                _server_addresses = Some(addrs);
+            }
         }
     }
 
-    if let Some(_) = matches.subcommand_matches("server") {
+    let mut _port: Option<u16> = None;
+    if let Some(sub_matches) = matches.subcommand_matches("server") {
         _mode = Mode::Server;
-    }
-
-    let mut _port: u16 = 0;
-    if let Some(port) = matches.get_one::<u16>("port") {
-        _port = *port;
+        if let Some(port) = sub_matches.get_one::<u16>("port") {
+            _port = Some(*port);
+        }
     }
 
     NodeCliArgs {
         node: _node,
         mode: _mode,
-        server_address: _server_address,
+        server_address: _server_addresses,
         debug: _debug,
         port: _port,
     }

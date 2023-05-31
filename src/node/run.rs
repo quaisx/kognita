@@ -35,7 +35,7 @@ use libp2p::{
     ping, ping::Success, 
     quic,
     swarm::NetworkBehaviour,
-    swarm::{keep_alive, SwarmBuilder, SwarmEvent},
+    swarm::{keep_alive, Swarm, SwarmBuilder, SwarmEvent},
     tcp,
     tcp::TokioTcpTransport,
     yamux, PeerId, Transport,
@@ -52,6 +52,7 @@ use std::time::{SystemTime, SystemTimeError};
 use lipsum::lipsum;
 use log::{debug, error, info, trace, warn};
 use std::env;
+use std::thread;
 
 use super::super::cli::args::Mode;
 use super::super::cli::args::NodeCliArgs;
@@ -162,28 +163,28 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
     match args.mode {
         Mode::Server => {
             // Listen on all ipv4 interfaces and ephemeral ports
-            swarm.listen_on(format!("/ip4/0.0.0.0/udp/{}/quic-v1", args.port).parse()?)?;
-            swarm.listen_on(format!("/ip4/0.0.0.0/tcp/{}", args.port).parse()?)?;
+            swarm.listen_on(format!("/ip4/0.0.0.0/udp/{}/quic-v1", args.port.unwrap()).parse()?)?;
+            swarm.listen_on(format!("/ip4/0.0.0.0/tcp/{}", args.port.unwrap()).parse()?)?;
         }
         Mode::Client => {
-            if let Some(srv_addr) = &args.server_address {
-                let mut prot_stack = srv_addr.protocol_stack();
-                let ma: Multiaddr;
-                _ = prot_stack.next();
-                match prot_stack.next() {
-                    Some(x) => match x {
-                        "udp" => {
-                            ma = srv_addr.clone().with(Protocol::QuicV1);
-                            //ma = srv_addr.clone();
+            if let Some(srv_addrs) = &args.server_address {
+                for a in srv_addrs {
+                    let mut prot_stack = a.protocol_stack();
+                    let ma: Multiaddr;
+                    _ = prot_stack.next();
+                    match prot_stack.next() {
+                        Some(x) => match x {
+                            "udp" => {
+                                ma = a.clone().with(Protocol::QuicV1);
+                            }
+                            _ => ma = a.clone(),
+                        },
+                        _ => {
+                            panic!("failed to format server address")
                         }
-                        _ => ma = srv_addr.clone(),
-                    },
-                    _ => {
-                        panic!("failed to format server address")
                     }
+                    swarm.dial(ma).unwrap();
                 }
-
-                swarm.dial(ma).unwrap();
             }
         }
     }
