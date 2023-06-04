@@ -59,6 +59,9 @@ This is my attempt to write a crypto platform using my previous experience with 
 2. Concurrency
 3. Reliability
 
+## Architecture
+![Algorithms](design/kognita-arch-v0.1.png)
+
 ## Why RUST for a crypto project?
 Well, I am not stepping into a phylosophical battle which programming language is the best overall. I am a beliver in choosing the right weapon for the right battle. And given my previous experience with crypto projects I think that Rust is an excellent choice for creating a crypto platform that would allow for blasting fast processing of high volumes of microtransactions. Think IoT. Think DAG. Think Markov Chain Monte Carlo. Cryptography. Multihashes. The list goes on. 
 
