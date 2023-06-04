@@ -34,6 +34,7 @@ use std::str::FromStr;
 pub struct NodeCliArgs {
     pub node: String,
     pub mode: Mode,
+    pub config: Option<String>,
     pub server_address: Option<Vec<Multiaddr>>,
     pub debug: u8,
     pub port: Option<u16>,
@@ -146,6 +147,12 @@ pub fn parse_cli() -> NodeCliArgs {
             )
         )
         .get_matches();
+    
+    let mut _config: Option<String> = None;
+    if let Some(c) = matches.get_one::<String>("config") {
+        _config = Some(c.clone());
+    }
+
     let mut _node: String = String::from("");
     // You can check the value provided by positional arguments, or option arguments
     if let Some(node) = matches.get_one::<String>("node") {
@@ -167,9 +174,6 @@ pub fn parse_cli() -> NodeCliArgs {
         }
         1 => {
             _debug = 1;
-        }
-        2 => {
-            _debug = 2;
         }
         _ => {
             _debug = 2;
@@ -204,6 +208,7 @@ pub fn parse_cli() -> NodeCliArgs {
     NodeCliArgs {
         node: _node,
         mode: _mode,
+        config: _config,
         server_address: _server_addresses,
         debug: _debug,
         port: _port,

@@ -1,0 +1,17 @@
+description = "Default Kognita node configuration"
+version = "0.1"
+
+[net]
+   tcp_nodelay = true
+   tcp_portreuse = true
+   tcp_timeout = 20
+   quic_handshake_timeout = 20
+
+[peer]
+   pubsub_heartbeat_interval = 15
+   pubsub_duplicate_cache_time = 100
+   pubsub_topic = "kognita/tx"
+   mdns_query_interval = 15
+   mdns_ttl = 30
+   ping_interval = 30
+   kad_query_timeout = 30

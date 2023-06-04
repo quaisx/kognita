@@ -24,7 +24,7 @@ cargo run -- node-1 server --port 33331
 ```
 To run server 2 on a local machine:
 ```bash
-cargo run -- node-1 server --port 33332
+cargo run -- node-2 server --port 33332
 ```
 To run client 1 on a local machine:
 ```bash
@@ -32,7 +32,7 @@ cargo run -- node-3 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<ma
 ```
 To run client 2 on a local machine:
 ```bash
-cargo run -- node-3 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<machine ip>/udp/33332
+cargo run -- node-4 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<machine ip>/udp/33332
 ```
 Note: we do not specify the protocol as part of the address. The client will add ../quic-v1/
 automatically as part of its connection establishment sequence.
@@ -58,6 +58,9 @@ This is my attempt to write a crypto platform using my previous experience with 
 1. Performance
 2. Concurrency
 3. Reliability
+
+## Architecture
+![Algorithms](design/kognita-arch-v0.1.png)
 
 ## Why RUST for a crypto project?
 Well, I am not stepping into a phylosophical battle which programming language is the best overall. I am a beliver in choosing the right weapon for the right battle. And given my previous experience with crypto projects I think that Rust is an excellent choice for creating a crypto platform that would allow for blasting fast processing of high volumes of microtransactions. Think IoT. Think DAG. Think Markov Chain Monte Carlo. Cryptography. Multihashes. The list goes on. 

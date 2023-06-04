@@ -56,6 +56,7 @@ use std::thread;
 
 use super::super::cli::args::Mode;
 use super::super::cli::args::NodeCliArgs;
+use super::super::cfg::load::NodeConfig;
 use super::config;
 extern crate pretty_env_logger;
 
@@ -72,9 +73,8 @@ struct PeerNetBehaviour {
     kad: kad::Kademlia<MemoryStore>,
 }
 
-pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
+pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(), Box<dyn Error>> {
     pretty_env_logger::init();
-
     let node_name = &args.node;
     info!("{}  ~ Running on {node_name}", config::E_ROCK.clone());
     // Let us generate crypto secure keys
@@ -97,7 +97,7 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
         .upgrade(upgrade::Version::V1Lazy)
         .authenticate(noise::Config::new(&key_pair)?)
         .multiplex(yamux::Config::default())
-        .timeout(std::time::Duration::from_secs(20))
+        .timeout(std::time::Duration::from_secs(30))
         .boxed();
     let mut quic_transport_config = quic::Config::new(&key_pair);
     quic_transport_config.handshake_timeout = std::time::Duration::from_secs(20);

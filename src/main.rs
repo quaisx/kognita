@@ -15,14 +15,25 @@
  */
 
 use std::error::Error;
-mod cli;
-mod node;
 use cli::args::parse_cli;
 use node::run;
+use cfg::load;
+
+mod cli;
+mod node;
+mod cfg;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let args = parse_cli();
-    println!("<ARGS> {args}");
-    run::run(&args).await
+    // load node configuration file (.toml)
+    let result = load::load_node_config(&args.config);
+    if let Err(x) =  result {
+        eprintln!("{:#?}", x);
+        std::process::exit(1);
+    } else {
+        let node_config = result.unwrap();
+        println!("<ARGS> {args}");
+        run::run(&args, node_config).await
+    }
 }
