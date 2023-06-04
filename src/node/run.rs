@@ -31,11 +31,11 @@ use libp2p::{
     },
     gossipsub, identify, identity, mdns,
     mdns::Mdns,
-    noise, 
-    ping, ping::Success, 
+    noise, ping,
+    ping::Success,
     quic,
     swarm::NetworkBehaviour,
-    swarm::{keep_alive, Swarm, SwarmBuilder, SwarmEvent},
+    swarm::{keep_alive, Swarm, SwarmBuilder, SwarmEvent, ListenError},
     tcp,
     tcp::TokioTcpTransport,
     yamux, PeerId, Transport,
@@ -89,14 +89,22 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
     );
 
     // Set up an encrypted DNS-enabled TCP Transport over the yamux protocol.
-    let tcp_transport = tcp::async_io::Transport::new(tcp::Config::default().nodelay(true))
+    let tcp_transport_config = 
+        tcp::Config::default()
+        .nodelay(true)
+        .port_reuse(true);
+    let tcp_transport = tcp::async_io::Transport::new(tcp_transport_config)
         .upgrade(upgrade::Version::V1Lazy)
         .authenticate(noise::Config::new(&key_pair)?)
         .multiplex(yamux::Config::default())
         .timeout(std::time::Duration::from_secs(20))
         .boxed();
-
-    let quic_transport = quic::async_std::Transport::new(quic::Config::new(&key_pair));
+    let mut quic_transport_config = quic::Config::new(&key_pair);
+    quic_transport_config.handshake_timeout = std::time::Duration::from_secs(20);
+    let quic_transport = 
+        quic::async_std::Transport::new(
+            quic_transport_config,
+        );
 
     let transport = OrTransport::new(quic_transport, tcp_transport)
         .map(|either_output, _| match either_output {
@@ -135,7 +143,7 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
         //let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
         let mut mdns_config = libp2p::mdns::Config::default();
         mdns_config.query_interval = Duration::from_secs(15);
-        mdns_config.ttl = Duration::from_secs(15);
+        mdns_config.ttl = Duration::from_secs(30);
         let mdns = libp2p::mdns::tokio::Behaviour::new(mdns_config, peer_id)?;
         let ping = ping::Behaviour::new(
             ping::Config::new().with_interval(Duration::from_secs(config::PING_INTERVAL)),
@@ -272,12 +280,15 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                      &peer_id
                  );
                 },
+                SwarmEvent::Dialing (pid) => {
+                    info!("{}  ~ <NET> Dialing {pid}", config::E_DIAL.clone());
+                },
                 SwarmEvent::ConnectionEstablished { peer_id, endpoint, .. } => {
-                 log::info!("{}  ~ <NET> Connected to {}:{}", config::E_PLUG.clone(), peer_id, endpoint.get_remote_address());
-                 },
-                 SwarmEvent::ConnectionClosed { peer_id, endpoint, .. } => {
-                     log::info!("{}  ~ <NET> Disconnected from {peer_id}:{}", config::E_PLUG.clone(), endpoint.get_remote_address());
-                 },
+                    info!("{}  ~ <NET> Connected to {}:{}", config::E_PLUG.clone(), peer_id, endpoint.get_remote_address());
+                },
+                SwarmEvent::ConnectionClosed { peer_id, endpoint, .. } => {
+                     info!("{}  ~ <NET> Disconnected from {peer_id}:{}", config::E_PLUG.clone(), endpoint.get_remote_address());
+                },
                  SwarmEvent::IncomingConnection {
                      local_addr, send_back_addr
                  } => {
@@ -287,16 +298,35 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                          local_addr
                      );
                  },
-                 SwarmEvent::IncomingConnectionError {
+                 SwarmEvent::OutgoingConnectionError { peer_id, error, .. } => {
+                    info!("{}  ~ <NET> Outgoing connection error to {:?}: {:#?}",
+                        config::E_ERR.clone(), 
+                        peer_id, 
+                        error);
+                }
+                SwarmEvent::IncomingConnectionError {
                     local_addr, send_back_addr, error
                  } => {
-                    error!(
-                        "{}  ~ <NET> Connection {} -> {} error: {error}",
-                        config::E_ERR.clone(),
-                        send_back_addr,
-                        local_addr,
-                        error = error
-                    );
+                    match error {
+                        ListenError::Transport(tv) => {
+                            error!(
+                                "{}  ~ <NET> Connection {} -> {} error: {:#?}",
+                                config::E_ERR.clone(),
+                                send_back_addr,
+                                local_addr,
+                                tv
+                            );       
+                        },
+                        _ => {
+                            error!(
+                                "{}  ~ <NET> Connection {} -> {} error: {error}",
+                                config::E_ERR.clone(),
+                                send_back_addr,
+                                local_addr,
+                                error = error
+                            );        
+                        }
+                    }
                  },
                  SwarmEvent::Behaviour(
                      PeerNetBehaviourEvent::Kad (
@@ -339,8 +369,28 @@ pub async fn run(args: &NodeCliArgs) -> Result<(), Box<dyn Error>> {
                                 info!("{}  ~ <PING SENT> {peer}", config::E_PING.clone());
                             },
                         }
-                    }                   
+                    }
                  },
+                 SwarmEvent::Behaviour(
+                    PeerNetBehaviourEvent::Identify(
+                        identify::Event::Sent { peer_id: pid })
+                ) => {
+                    info!("{}  ~ <ID> Sent identity data to {pid}", config::E_ID.clone());
+                },
+                SwarmEvent::Behaviour(
+                    PeerNetBehaviourEvent::Identify(
+                        identify::Event::Received {
+                            peer_id: pid,
+                            info: identify::Info { listen_addrs, protocols, .. },
+                        }
+                    )
+                ) => {
+                    info!("{}  ~ <ID> Received identity from {pid}: {:#?}, {:#?}",
+                        config::E_ID.clone(),
+                        listen_addrs,
+                        protocols
+                    );
+                }
                  other_event => {
                     warn!("{}  ~ <UNHANDLED> {:#?}", config::E_EVT.clone(), other_event);
                 }
