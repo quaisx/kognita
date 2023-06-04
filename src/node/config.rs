@@ -31,6 +31,7 @@ static STR_EVT: &str = "incoming_envelope";
 static STR_ROCK: &str = "rocket";
 static STR_PLUG: &str = "electric_plug";
 static STR_ERR: &str = "collision";
+static STR_DIAL: &str = "telephone_receiver";
 
 pub static E_ID: once_cell::sync::Lazy<&emojis::Emoji> =
     once_cell::sync::Lazy::new(|| emojis::get_by_shortcode(&STR_ID).unwrap());
@@ -50,3 +51,5 @@ pub static E_PLUG: once_cell::sync::Lazy<&emojis::Emoji> =
     once_cell::sync::Lazy::new(|| emojis::get_by_shortcode(&STR_PLUG).unwrap());
 pub static E_ERR: once_cell::sync::Lazy<&emojis::Emoji> =
     once_cell::sync::Lazy::new(|| emojis::get_by_shortcode(&STR_ERR).unwrap());
+pub static E_DIAL: once_cell::sync::Lazy<&emojis::Emoji> =
+    once_cell::sync::Lazy::new(|| emojis::get_by_shortcode(&STR_DIAL).unwrap());

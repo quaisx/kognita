@@ -8,15 +8,35 @@
 ```
 
 # LATEST UPDATE
-I am working on branch feat/bootstrap to deploy and use bootstrap nodes.
-I am working on branch feat/baremetal to run kognita nodes on bare metal Raspberry Pi.
+I am working on branch feat/bootstrap-x to deploy and use bootstrap nodes.
+Server nodes may run as locally so as in the cloud. Make sure the servers are reachable from outside. Consult your cloud provider for information how to enable external access.
 
+# CURRENT WORK
+1. Add node configuration file to allow nodes to be fine tuned based on the needs and the current state of the network.
+2. Add gRPC service to allow a blockchain or dag component to interact with the node.
+3. Add transaction injection utility to test the gRPC service and test its performance.
+   
 ## DR;TL
 check out kognita https://github.com/quaisx/kognita
+To run server 1 on a local machine:
 ```bash
-cargo build
-cargo run -- <node_name> --port <PORT> [client --server_address <ADDR> | server]
+cargo run -- node-1 server --port 33331
 ```
+To run server 2 on a local machine:
+```bash
+cargo run -- node-1 server --port 33332
+```
+To run client 1 on a local machine:
+```bash
+cargo run -- node-3 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<machine ip>/udp/33332
+```
+To run client 2 on a local machine:
+```bash
+cargo run -- node-3 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<machine ip>/udp/33332
+```
+Note: we do not specify the protocol as part of the address. The client will add ../quic-v1/
+automatically as part of its connection establishment sequence.
+
 Nodes can run in two modes: __server__ and __client__
 
 Server address must be in the format: /ip4/<ip4 address>/tcp/<port>
@@ -64,12 +84,16 @@ I will need to work out a viable and econimically sound motivation model which w
 The network should be self gouverned and the nodes themselves must elect the nodes with the highest ratings to perform the most trustworthy operations, such as transaction validation. This model should be resistant to various exploits to prevent malicious nodes from taking over the network. The rating system should be fair and all nodes should have a chance to participate in activities that allow them to earn fair share of profits while participating on the network. 
 
 ## Fairness
+All nodes must fairly assess other nodes' contributions to the network and vote on their ratings accordingly. The voting mechanism is being designed based on the best practices in this domain.
 
 ## Security
+The system must be secure in a number of aspects to allow for secure transmission of the content as well as resistant to all known attacks.
 
 ## Scalability
+The solution must be automatically scalable to allow for the growing load on the network. At this time, among other things, I am designing a backpressure mechanism to allow for the network to choose the right scaling option to properly distrube the load.
 
 ## Marketability
+The solution must be attractable for the end users through such things as reward and various incetives; ease of use; community adoption and support; documentation; examples; practical use cases based on the current needs of the market.
 
 ## User Interface
 

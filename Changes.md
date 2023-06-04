@@ -15,7 +15,8 @@ May 28 - add rendezvous discovery; use mdns tokio for mdns discovery;
 
 May 29 - cli args with clap;
 
-May 3- add Kademlia DHT support;
+May 30 - add Kademlia DHT support;
 
+Jun 4 - add handling of incoming connection errors; set handshake timeout to allow for enough time to handle connection negotiations;
 
 
