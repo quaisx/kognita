@@ -16,11 +16,6 @@
 
 use emojis;
 use once_cell;
-pub const PING_INTERVAL: u64 = 30;
-
-pub const HEARTBEAT_INTERVAL: u64 = 15; // gossibsub hb interval in seconds
-
-pub static STR_RENDEZVOUS_POINT: &str = "kognita/1.0.0/12345";
 
 static STR_ID: &str = "identification_card";
 static STR_WARN: &str = "warning";
