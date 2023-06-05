@@ -24,6 +24,8 @@ use std::io::prelude::*;
 use std::env;
 use dirs;
 
+use super::defaults;
+
 static KOGNITA_CONFIG: &'static str = "KOGNITA_CONFIG";
 
 #[derive(Debug, Deserialize)]
@@ -34,6 +36,28 @@ pub struct NodeConfig {
     pub peer: Option<PeerConfig>,
 }
 
+impl NodeConfig {
+    pub fn new() -> NodeConfig {
+        NodeConfig {
+            description: Some(defaults::DEF_DESCRIPTION.to_string()),
+            version: Some(defaults::DEF_VERSION.to_string()),
+            net: Some(NetConfig::new()),
+            peer: Some(PeerConfig::new()),
+        }
+    }
+    pub fn description(&self) -> &String {
+        self.description.as_ref().unwrap()
+    }
+    pub fn version(&self) -> &String {
+        self.version.as_ref().unwrap()
+    }
+    pub fn net(&mut self) -> &NetConfig {
+        self.net.as_ref().unwrap()
+    }
+    pub fn peer(&mut self) -> &PeerConfig {
+        self.peer.as_ref().unwrap()
+    }
+}
 /// Sub-structs are decoded from tables, so this will decode from the `[server]`
 /// table.
 ///
@@ -46,6 +70,29 @@ pub struct NetConfig {
     pub quic_handshake_timeout: Option<u64>,
  }
 
+impl NetConfig {
+    pub fn new() -> NetConfig {
+        NetConfig {
+            tcp_nodelay: Some(defaults::DEF_TCP_NODELAY),
+            tcp_portreuse: Some(defaults::DEF_TCP_PORTREUSE),
+            tcp_timeout: Some(defaults::DEF_TCP_TIMEOUT),
+            quic_handshake_timeout: Some(defaults::DEF_QUIC_HANDSHAKE_TIMEOUT),
+        }
+    }
+    pub fn tcp_nodelay(&self) -> bool {
+        self.tcp_nodelay.unwrap_or(defaults::DEF_TCP_NODELAY)
+    }
+    pub fn tcp_portreuse(&self) -> bool {
+        self.tcp_portreuse.unwrap_or(defaults::DEF_TCP_PORTREUSE)
+    }
+    pub fn tcp_timeout(&self) -> u64 {
+        self.tcp_timeout.unwrap_or(defaults::DEF_TCP_TIMEOUT)
+    }
+    pub fn quic_handshake_timeout(&self) -> u64 {
+        self.quic_handshake_timeout.unwrap_or(defaults::DEF_QUIC_HANDSHAKE_TIMEOUT)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct PeerConfig {
     pub pubsub_heartbeat_interval: Option<u64>,
@@ -55,6 +102,46 @@ pub struct PeerConfig {
     pub mdns_ttl: Option<u64>,
     pub ping_interval: Option<u64>,
     pub kad_query_timeout: Option<u64>,
+    pub rendezvous_point: Option<String>,
+}
+
+impl PeerConfig {
+    pub fn new() -> PeerConfig {
+        PeerConfig {
+            pubsub_heartbeat_interval: None,
+            pubsub_duplicate_cache_time: None,
+            pubsub_topic: Some(String::from(defaults::DEF_PUBSUB_TOPIC)),
+            mdns_query_interval: None,
+            mdns_ttl: None,
+            ping_interval: None,
+            kad_query_timeout: None,
+            rendezvous_point: Some(String::from(defaults::DEF_RENDEZVOUS_POINT)),
+        }
+    }
+    pub fn pubsub_heartbeat_interval(&self) -> u64 {
+        self.pubsub_heartbeat_interval.unwrap_or(defaults::DEF_PUBSUB_HEARTBEAT_INTERVAL)
+    }
+    pub fn pubsub_duplicate_cache_time(&self) -> u64 {
+        self.pubsub_duplicate_cache_time.unwrap_or(defaults::DEF_PUBSUB_DUPLICATE_CACHE_TIME)
+    }
+    pub fn pubsub_topic(&self) -> &String {
+        self.pubsub_topic.as_ref().unwrap()
+    }
+    pub fn mdns_query_interval(&self) -> u64 {
+        self.mdns_query_interval.unwrap_or(defaults::DEF_MDNS_QUERY_INTERVAL)
+    }
+    pub fn mdns_ttl(&self) -> u64 {
+        self.mdns_ttl.unwrap_or(defaults::DEF_MDNS_TTL)
+    }
+    pub fn ping_interval(&self) -> u64 {
+        self.ping_interval.unwrap_or(defaults::DEF_PING_INTERVAL)
+    }
+    pub fn kad_query_timeout(&self) -> u64 {
+        self.kad_query_timeout.unwrap_or(defaults::DEF_KAD_QUERY_TIMEOUT)
+    }
+    pub fn rendezvous_point(&self) -> &String {
+        self.rendezvous_point.as_ref().unwrap()
+    }
 }
 
 fn load_config(cfg_path: &String) -> Result<Box<NodeConfig>, Box<dyn std::error::Error>> {

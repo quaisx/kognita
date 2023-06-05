@@ -14,4 +14,5 @@ version = "0.1"
    mdns_query_interval = 15
    mdns_ttl = 30
    ping_interval = 30
-   kad_query_timeout = 30
+   kad_query_timeout = 300
+   rendezvous_point = "kognita/1.0.0/12345"

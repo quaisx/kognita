@@ -60,8 +60,6 @@ use super::super::cfg::load::NodeConfig;
 use super::config;
 extern crate pretty_env_logger;
 
-const PUBSUB_TOPIC: &str = "kognita/tx";
-
 // Custom Swarm Network behaviors
 #[derive(NetworkBehaviour)]
 struct PeerNetBehaviour {
@@ -76,6 +74,7 @@ struct PeerNetBehaviour {
 pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(), Box<dyn Error>> {
     pretty_env_logger::init();
     let node_name = &args.node;
+    let mut nc = *node_config;
     info!("{}  ~ Running on {node_name}", config::E_ROCK.clone());
     // Let us generate crypto secure keys
     let key_pair = identity::Keypair::generate_ed25519();
@@ -91,16 +90,16 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
     // Set up an encrypted DNS-enabled TCP Transport over the yamux protocol.
     let tcp_transport_config = 
         tcp::Config::default()
-        .nodelay(true)
-        .port_reuse(true);
+        .nodelay(nc.net().tcp_nodelay())
+        .port_reuse(nc.net().tcp_portreuse());
     let tcp_transport = tcp::async_io::Transport::new(tcp_transport_config)
         .upgrade(upgrade::Version::V1Lazy)
         .authenticate(noise::Config::new(&key_pair)?)
         .multiplex(yamux::Config::default())
-        .timeout(std::time::Duration::from_secs(30))
+        .timeout(std::time::Duration::from_secs(nc.net().tcp_timeout()))
         .boxed();
     let mut quic_transport_config = quic::Config::new(&key_pair);
-    quic_transport_config.handshake_timeout = std::time::Duration::from_secs(20);
+    quic_transport_config.handshake_timeout = std::time::Duration::from_secs(nc.net().quic_handshake_timeout());
     let quic_transport = 
         quic::async_std::Transport::new(
             quic_transport_config,
@@ -122,8 +121,8 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
 
     // Set a custom gossipsub configuration
     let gossipsub_config = gossipsub::ConfigBuilder::default()
-        .heartbeat_interval(Duration::from_secs(config::HEARTBEAT_INTERVAL)) // This is set to aid debugging by not cluttering the log space
-        .duplicate_cache_time(Duration::from_millis(100))
+        .heartbeat_interval(Duration::from_secs(nc.peer().pubsub_heartbeat_interval())) // This is set to aid debugging by not cluttering the log space
+        .duplicate_cache_time(Duration::from_millis(nc.peer().pubsub_duplicate_cache_time()))
         .validation_mode(gossipsub::ValidationMode::Strict) // This sets the kind of message validation. The default is Strict (enforce message signing)
         .message_id_fn(message_id_fn) // content-address messages. No two messages of the same content will be propagated.
         .build()?;
@@ -134,7 +133,7 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
         gossipsub_config,
     )?;
     // Create a Gossipsub topic
-    let topic = gossipsub::IdentTopic::new(PUBSUB_TOPIC);
+    let topic = gossipsub::IdentTopic::new(nc.peer().pubsub_topic());
     // subscribes to our topic
     gossipsub.subscribe(&topic)?;
 
@@ -142,18 +141,19 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
     let mut swarm = {
         //let mdns = mdns::async_io::Behaviour::new(mdns::Config::default(), peer_id)?;
         let mut mdns_config = libp2p::mdns::Config::default();
-        mdns_config.query_interval = Duration::from_secs(15);
-        mdns_config.ttl = Duration::from_secs(30);
+        mdns_config.query_interval = Duration::from_secs(nc.peer().mdns_query_interval());
+        mdns_config.ttl = Duration::from_secs(nc.peer().mdns_ttl());
         let mdns = libp2p::mdns::tokio::Behaviour::new(mdns_config, peer_id)?;
         let ping = ping::Behaviour::new(
-            ping::Config::new().with_interval(Duration::from_secs(config::PING_INTERVAL)),
+            ping::Config::new().with_interval(Duration::from_secs(nc.peer().ping_interval())),
         );
-        let identify = identify::Behaviour::new(identify::Config::new(
-            config::STR_RENDEZVOUS_POINT.to_string(),
+        let identify = identify::Behaviour::new(
+            identify::Config::new(
+            nc.peer().rendezvous_point().to_string(),
             key_pair.public(),
         ));
         let mut cfg = KademliaConfig::default();
-        cfg.set_query_timeout(Duration::from_secs(5 * 60));
+        cfg.set_query_timeout(Duration::from_secs(nc.peer().kad_query_timeout()));
         let store = MemoryStore::new(peer_id);
         let kad = Kademlia::with_config(peer_id, store, cfg);
 
