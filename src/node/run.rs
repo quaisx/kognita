@@ -17,6 +17,7 @@
 #![allow(deprecated)]
 #![allow(unused_imports)]
 
+use async_std::task::JoinHandle;
 use futures::{future::Either, prelude::*, select, StreamExt};
 use libp2p::kad::record::store::MemoryStore;
 use libp2p::kad::{
@@ -40,7 +41,7 @@ use libp2p::{
     tcp::TokioTcpTransport,
     yamux, PeerId, Transport,
 };
-
+use tonic::{transport::Server, Request, Response, Status};
 use emojis;
 use rand::Rng;
 use std::collections::hash_map::DefaultHasher;
@@ -57,8 +58,11 @@ use std::thread;
 use super::super::cli::args::Mode;
 use super::super::cli::args::NodeCliArgs;
 use super::super::cfg::load::NodeConfig;
+use super::super::service::post;
 use super::config;
+
 extern crate pretty_env_logger;
+
 
 // Custom Swarm Network behaviors
 #[derive(NetworkBehaviour)]
@@ -196,6 +200,11 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
             }
         }
     }
+    let grpc_port = args.grpc_server_port;
+    let handler = thread::spawn( move || {
+        post::run(grpc_port)
+    });
+
     let num = rand::thread_rng().gen_range(5..10);
     // let mut tcr = futures_ticker::Ticker::new_with_next(Duration::from_secs(num), Duration::from_secs(10)).fuse();
 
@@ -267,11 +276,17 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
                             message,
                         }
                     )
-                ) => info!(
+                ) => {
+                    info!(
                         "{}  ~ <MESSAGE>: '{}' with id: {id} from peer: {peer_id}",
                         config::E_EVT.clone(),
                         String::from_utf8_lossy(&message.data),
-                 ),
+                    );
+                    let payload = String::from_utf8_lossy(&message.data);
+                    if payload == "QUIT" {
+                        break;
+                    }
+                },
                 // New address found event swarm will listen on
                 SwarmEvent::NewListenAddr { address, .. } => {
                     info!("{}  ~ <NET> [{}]:{} is listening on {address}",
@@ -397,4 +412,6 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
             }
         }
     }
+    let _grpc_stop = handler.join().expect("Failed to join gRPC thread");
+    Ok(())
 }
