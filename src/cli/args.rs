@@ -36,6 +36,7 @@ pub struct NodeCliArgs {
     pub mode: Mode,
     pub config: Option<String>,
     pub server_address: Option<Vec<Multiaddr>>,
+    pub grpc_server_port: Option<u16>,
     pub debug: u8,
     pub port: Option<u16>,
 }
@@ -53,9 +54,13 @@ impl Display for NodeCliArgs {
             }
             Mode::Server => srv_msg = "n/a".to_string(),
         }
+        let mut grpc_port: u16 = 0;
+        if let Some(p) = &self.grpc_server_port {
+            grpc_port = *p;
+        }
         let mut port: u16 = 0;
         if let Some(p) = self.port {
-                    port = p;
+            port = p;
         }
         match self.mode {
             Mode::Client => {
@@ -68,8 +73,8 @@ impl Display for NodeCliArgs {
             Mode::Server => {
                 write!(
                     f,
-                    "node:{}, mode:{}, port:{}, debug:{}",
-                    self.node, self.mode, port, self.debug
+                    "node:{}, mode:{}, port:{}, grpc-port:{}, debug:{}",
+                    self.node, self.mode, port, grpc_port, self.debug
                 )
             }
         }
@@ -124,6 +129,14 @@ pub fn parse_cli() -> NodeCliArgs {
         .arg(arg!(
                 -d --debug ... "Enable debug level logs"
         ))
+        .arg(
+            arg!(
+                --grpc_port <PORT>)
+            .value_parser(value_parser!(u16))
+            .default_value("50551")
+            .required(true),
+        )
+
         .subcommand(
             Command::new("client")
                 .about("run this node as a client")
@@ -151,6 +164,10 @@ pub fn parse_cli() -> NodeCliArgs {
     let mut _config: Option<String> = None;
     if let Some(c) = matches.get_one::<String>("config") {
         _config = Some(c.clone());
+    }
+    let mut _grpc_port: Option<u16> = None;
+    if let Some(p) = matches.get_one::<u16>("grpc_port") {
+            _grpc_port = Some(*p);
     }
 
     let mut _node: String = String::from("");
@@ -210,6 +227,7 @@ pub fn parse_cli() -> NodeCliArgs {
         mode: _mode,
         config: _config,
         server_address: _server_addresses,
+        grpc_server_port: _grpc_port,
         debug: _debug,
         port: _port,
     }
