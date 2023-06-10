@@ -201,10 +201,9 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
         }
     }
     let grpc_port = args.grpc_server_port;
-    let handler = thread::spawn( move || {
-        post::run(grpc_port)
+    let handle = tokio::spawn(async move {
+        post::run(grpc_port).await
     });
-
     let num = rand::thread_rng().gen_range(5..10);
     // let mut tcr = futures_ticker::Ticker::new_with_next(Duration::from_secs(num), Duration::from_secs(10)).fuse();
 
@@ -412,6 +411,6 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
             }
         }
     }
-    let _grpc_stop = handler.join().expect("Failed to join gRPC thread");
+    let _grpc_stop = handle.await.expect("Failed to join gRPC thread");
     Ok(())
 }

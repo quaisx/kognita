@@ -19,6 +19,7 @@
 use tonic::{transport::Server, Request, Response, Status};
 use message::message_server::{Message, MessageServer};
 use message::{MessageRequest, MessageResponse};
+use log::{debug, error, info, trace, warn};
 
 pub mod message {
     tonic::include_proto!("message");
@@ -42,20 +43,16 @@ impl Message for MessageService {
     }
 }
 
-pub async fn run(port: Option<u16>)  {
+pub async fn run(port: Option<u16>) -> Result<(), tonic::transport::Error> {
+    info!("* gRPC service is running...");
     let _grpc_port = port.unwrap_or(50551);
     let addr = format!("0.0.0.0:{}", _grpc_port).parse().unwrap_or_else(
         |_| format!("::{}", _grpc_port).parse().unwrap()
     );
+    eprintln!("gRPC addres:: {}", addr);
     let post_service = MessageService::default();
 
-    let future = Server::builder()
+    Server::builder()
         .add_service(MessageServer::new(post_service))
-        .serve(addr);
-    future.await.unwrap_or_else(
-        |e| {
-            eprintln!("server error: {}", e);
-            std::process::exit(1);
-        },
-    );
+        .serve(addr).await
 }
