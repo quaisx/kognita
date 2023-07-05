@@ -38,7 +38,7 @@ automatically as part of its connection establishment sequence.
 
 We can test the gRPC service on node-2 by running grpcurl utility:
 ```bash
-$  -plaintext -import-path ./proto -proto message.proto -d '{"message": "Kognita"}' localhost:50552 message.Message/Post
+$ grpcurl  -plaintext -import-path ./proto -proto message.proto -d '{"message": "Kognita"}' localhost:50552 message.Message/Post
 {
   "statusMessage": "request msg: Kognita"
 }
