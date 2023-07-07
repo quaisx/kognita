@@ -159,7 +159,7 @@ impl From<Box<PeerNetBehaviour>> for PeerNetBehaviour {
       .build()?;
 
       // build a gossipsub network behaviour
-      let mut gossipsub = gossipsub::Behaviour::new(
+      let gossipsub = gossipsub::Behaviour::new(
          gossipsub::MessageAuthenticity::Signed(self.key_pair.clone()),
          gossipsub_config,
       )?;

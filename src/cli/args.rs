@@ -181,21 +181,9 @@ pub fn parse_cli() -> NodeCliArgs {
     if let Some(config_path) = matches.get_one::<PathBuf>("config") {
         _config_path = config_path.clone();
     }
-    let _debug: u8;
-    match matches
+    let _debug: u8 = *matches
         .get_one::<u8>("debug")
-        .expect("Count's are defaulted")
-    {
-        0 => {
-            _debug = 0;
-        }
-        1 => {
-            _debug = 1;
-        }
-        _ => {
-            _debug = 2;
-        }
-    }
+        .expect("unexpected debug value. valid range is [0-2");
     let mut _mode: Mode = Mode::Client;
     let mut _server_addresses: Option<Vec<Multiaddr>> = None;
     if let Some(sub_matches) = matches.subcommand_matches("client") {

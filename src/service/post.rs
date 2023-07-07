@@ -20,11 +20,9 @@ use tonic::{transport::Server, Request, Response, Status};
 use message::message_server::{Message, MessageServer};
 use message::{MessageRequest, MessageResponse};
 use log::{info};
-use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
+use tokio::sync::mpsc::{ UnboundedSender};
 use std::sync::Arc;
 use std::sync::Mutex;
-use libp2p::swarm::Swarm;
-use super::super::node::p2p::PeerNetBehaviour;
 pub mod message {
     tonic::include_proto!("message");
 }

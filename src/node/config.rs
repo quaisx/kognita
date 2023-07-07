@@ -14,6 +14,7 @@
 
  */
 
+#![allow(dead_code)]
 use emojis;
 use once_cell;
 
