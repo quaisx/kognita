@@ -108,7 +108,6 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
     });
 
     let num = rand::thread_rng().gen_range(5..10);
-    // let mut tcr = futures_ticker::Ticker::new_with_next(Duration::from_secs(num), Duration::from_secs(10)).fuse();
 
     let mut tcr = tokio::time::interval(Duration::from_secs(num));
       // Create a Gossipsub topic
