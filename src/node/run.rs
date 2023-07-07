@@ -102,9 +102,9 @@ pub async fn run(args: &NodeCliArgs, node_config: Box<NodeConfig>) -> Result<(),
     }
     let grpc_port = args.grpc_server_port;
     let (chs, mut chr) = unbounded_channel::<String>();
-    let z = Arc::new(Mutex::new(chs.clone()));
+    let ch_snd_c = Arc::new(Mutex::new(chs.clone()));
     let handle = tokio::spawn(async move {
-        post::run(grpc_port, z).await
+        post::run(grpc_port, ch_snd_c).await
     });
 
     let num = rand::thread_rng().gen_range(5..10);
