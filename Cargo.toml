@@ -7,9 +7,12 @@ edition = "2021"
 
 [dependencies]
     libp2p = { version = "0.51", features = ["tcp", "kad", "tokio", "identify", "quic", "async-std", "dns", "gossipsub", "mdns", "noise", "ping", "mplex", "yamux", "websocket", "ping", "macros"] }
-    futures = "0.3.28"
+    futures = { version = "0.3.28" }
+    futures-core = { version = "0.3.28" }
+    futures-util = { version = "0.3.28" }
     async-std = { version = "1.12.0", features = ["attributes"] }
     tokio = { version = "1.28.1", features = ["full"] }
+    tokio-stream = { version = "0.1.14" }
     rand = "0.8.5"
     rand_core = { version = "0.6.4", default-features = false }
     once_cell = "1.17.1"
@@ -22,14 +25,20 @@ edition = "2021"
     log = "0.4.17"
     pretty_env_logger = "0.5.0"
     serde = { version = "1.0", features = ["derive"] }
+    serde_json = "1.0.96"
     anyhow = "1.0"
     dotenv = "0.15.0"
     secp256k1 = { version = "0.27.0", features = ["rand"] }
     web3 = "0.18.0"
-    serde_json = "1.0"
     tiny-keccak = { version = "2.0.2", features = ["sha3"] }
     openssl = { version = "0.10", features = ["vendored"] }
     aes-gcm = "0.10.2"
     toml = "0.7.4"
     dirs = "5.0.1"
+
+    tonic = "0.9"
+    prost = "0.11"
+
+[build-dependencies]
+    tonic-build = "0.9"
 

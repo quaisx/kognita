@@ -36,6 +36,7 @@ pub struct NodeCliArgs {
     pub mode: Mode,
     pub config: Option<String>,
     pub server_address: Option<Vec<Multiaddr>>,
+    pub grpc_server_port: Option<u16>,
     pub debug: u8,
     pub port: Option<u16>,
 }
@@ -53,9 +54,13 @@ impl Display for NodeCliArgs {
             }
             Mode::Server => srv_msg = "n/a".to_string(),
         }
+        let mut grpc_port: u16 = 0;
+        if let Some(p) = &self.grpc_server_port {
+            grpc_port = *p;
+        }
         let mut port: u16 = 0;
         if let Some(p) = self.port {
-                    port = p;
+            port = p;
         }
         match self.mode {
             Mode::Client => {
@@ -68,8 +73,8 @@ impl Display for NodeCliArgs {
             Mode::Server => {
                 write!(
                     f,
-                    "node:{}, mode:{}, port:{}, debug:{}",
-                    self.node, self.mode, port, self.debug
+                    "node:{}, mode:{}, port:{}, grpc-port:{}, debug:{}",
+                    self.node, self.mode, port, grpc_port, self.debug
                 )
             }
         }
@@ -124,6 +129,14 @@ pub fn parse_cli() -> NodeCliArgs {
         .arg(arg!(
                 -d --debug ... "Enable debug level logs"
         ))
+        .arg(
+            arg!(
+                --grpc_port <PORT>)
+            .value_parser(value_parser!(u16))
+            .default_value("50551")
+            .required(true),
+        )
+
         .subcommand(
             Command::new("client")
                 .about("run this node as a client")
@@ -152,6 +165,10 @@ pub fn parse_cli() -> NodeCliArgs {
     if let Some(c) = matches.get_one::<String>("config") {
         _config = Some(c.clone());
     }
+    let mut _grpc_port: Option<u16> = None;
+    if let Some(p) = matches.get_one::<u16>("grpc_port") {
+            _grpc_port = Some(*p);
+    }
 
     let mut _node: String = String::from("");
     // You can check the value provided by positional arguments, or option arguments
@@ -164,21 +181,9 @@ pub fn parse_cli() -> NodeCliArgs {
     if let Some(config_path) = matches.get_one::<PathBuf>("config") {
         _config_path = config_path.clone();
     }
-    let _debug: u8;
-    match matches
+    let _debug: u8 = *matches
         .get_one::<u8>("debug")
-        .expect("Count's are defaulted")
-    {
-        0 => {
-            _debug = 0;
-        }
-        1 => {
-            _debug = 1;
-        }
-        _ => {
-            _debug = 2;
-        }
-    }
+        .expect("unexpected debug value. valid range is [0-2");
     let mut _mode: Mode = Mode::Client;
     let mut _server_addresses: Option<Vec<Multiaddr>> = None;
     if let Some(sub_matches) = matches.subcommand_matches("client") {
@@ -210,6 +215,7 @@ pub fn parse_cli() -> NodeCliArgs {
         mode: _mode,
         config: _config,
         server_address: _server_addresses,
+        grpc_server_port: _grpc_port,
         debug: _debug,
         port: _port,
     }

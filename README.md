@@ -18,28 +18,57 @@ Server nodes may run as locally so as in the cloud. Make sure the servers are re
    
 ## DR;TL
 check out kognita https://github.com/quaisx/kognita
+To see the log files: 
+```bash
+export RUST_LOG=info
+```
 To run server 1 on a local machine:
 ```bash
-cargo run -- node-1 server --port 33331
+cargo run -- node-1 --grpc-port 50551 server --port 33331
 ```
 To run server 2 on a local machine:
 ```bash
-cargo run -- node-2 server --port 33332
+cargo run -- node-2 --grpc-port 50552 server --port 33332
 ```
 To run client 1 on a local machine:
 ```bash
-cargo run -- node-3 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<machine ip>/udp/33332
+cargo run -- node-3 --grpc-port 50553 client --server_address /ip4/[machine ip]/udp/33331,/ip4/[machine ip]/udp/33332
 ```
 To run client 2 on a local machine:
 ```bash
-cargo run -- node-4 client --server_address /ip4/<machine ip>/udp/33331,/ip4/<machine ip>/udp/33332
+cargo run -- node-4 --grpc-port 50554 client --server_address /ip4/[machine ip]/udp/33331,/ip4/[machine ip]/udp/33332
 ```
 Note: we do not specify the protocol as part of the address. The client will add ../quic-v1/
 automatically as part of its connection establishment sequence.
 
+We can test the gRPC service on node-2 by running grpcurl utility:
+```bash
+$ grpcurl  -plaintext -import-path ./proto -proto message.proto -d '{"message": "Kognita"}' localhost:50552 message.Message/Post
+{
+  "statusMessage": "request msg: Kognita"
+}
+```
+You should also see a message similar to below in the server log:
+```
+gRPC Request Request {
+    metadata: MetadataMap {
+        headers: {
+            "content-type": "application/grpc",
+            "user-agent": "grpcurl/1.8.7 grpc-go/1.48.0",
+            "te": "trailers",
+        },
+    },
+    message: MessageRequest {
+        message: "Kognita",
+    },
+    extensions: Extensions,
+}
+```
+Now that gRPC basic message service is working, we can wire the code to inject the messages received via the gRPC service into the pubsub. I will do that next.
+
 Nodes can run in two modes: __server__ and __client__
 
-Server address must be in the format: /ip4/<ip4 address>/tcp/<port>
+Server address must be in the format: /ip4/[ip4 address]/tcp/<port>
 
 When the node runs in __server__ mode, it only listens for incoming connections from the client nodes. The server nodes are so called bootstrapping nodes.
 
@@ -116,8 +145,6 @@ The test harness comes with a UI which allows for node discovery, connectivity, 
 ********************************
 
 <img src="design/txge-ui-mock.png" alt="transaction generator" style="height: 50%; width:50%;"/>
-
-
 
 # Conclusion
 Once again, this is work in progress. I do not expect this platform to be a viable candidate for replacing Ethereum or Bitcoin. That would be too ambisious of me, and, frankly, unachievable with the manpower/hours available to build such a network any time soon. But, as the saying goes - a thousand mile journey starts with a single step. The only goal I have determination to achieve is to become a better Rust architect/developer. 

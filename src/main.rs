@@ -22,6 +22,7 @@ use cfg::load;
 mod cli;
 mod node;
 mod cfg;
+mod service;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

@@ -20,3 +20,5 @@ May 30 - add Kademlia DHT support;
 Jun 4 - add handling of incoming connection errors; set handshake timeout to allow for enough time to handle connection negotiations;
 
 Jun 5 - replace const values used in net and peer layers with defaults and config file node.toml; the app uses the defaults/config values from now on.
+
+Jun 9 - add simple gRPC service to inject messages instead of generating them randomly; use tonic crate to generate gRPC artifacts;
