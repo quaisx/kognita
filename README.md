@@ -12,8 +12,9 @@ Server nodes may run as locally so as in the cloud. Make sure the servers are re
 
 # CURRENT WORK
 1. ~~Add node configuration file to allow nodes to be fine tuned based on the needs and the current state of the network.~~ DONE
-2. Add gRPC service to allow a blockchain or dag component to interact with the node.
-3. Add transaction injection utility to test the gRPC service and test its performance.
+2. ~~Add gRPC service to allow a blockchain or dag component to interact with the node.~~ DONE
+3. *Add transaction injection utility to test the gRPC service and test its performance* - Work in progress... [WASM, YEW]
+
    
 ## DR;TL
 check out kognita https://github.com/quaisx/kognita
@@ -62,7 +63,8 @@ This is my attempt to write a crypto platform using my previous experience with 
 ![Algorithms](design/kognita-arch-v0.1.png)
 
 ## Why RUST for a crypto project?
-Well, I am not stepping into a phylosophical battle which programming language is the best overall. I am a beliver in choosing the right weapon for the right battle. And given my previous experience with crypto projects I think that Rust is an excellent choice for creating a crypto platform that would allow for blasting fast processing of high volumes of microtransactions. Think IoT. Think DAG. Think Markov Chain Monte Carlo. Cryptography. Multihashes. The list goes on. 
+Well, I am not stepping into a phylosophical battle which programming language is the best overall. I am a beliver in choosing the right weapon for the right battle. And given my previous experience with crypto projects I think that Rust is an excellent choice for creating a crypto platform that would allow for blasting fast processing of high volumes of microtransactions. Think IoT. Think DAG. Think Markov Chain Monte Carlo. Cryptography. Multihashes. The list goes on...
+The project uses WASM and YEW for the web based UI. 
 
 
 ## Expectations and reality
@@ -100,6 +102,22 @@ The solution must be attractable for the end users through such things as reward
 ## User Interface
 
 ... and many other topics.
+
+## Testability and Proof of Specs
+The solution must demonstrate the ability to test its functionality, speed, throughput and reliability through generating an authoriative report on test coverage, benchmarking, pique performance, resiliency, recovery, etc.
+
+## Testing harness
+The testing harness is the gateway into the node and network performance.
+TBD: *
+
+### Transaction generation
+The test harness comes with a UI which allows for node discovery, connectivity, scheduling tasks (e.g. generating test transactions)
+
+********************************
+
+<img src="design/txge-ui-mock.png" alt="transaction generator" style="height: 50%; width:50%;"/>
+
+
 
 # Conclusion
 Once again, this is work in progress. I do not expect this platform to be a viable candidate for replacing Ethereum or Bitcoin. That would be too ambisious of me, and, frankly, unachievable with the manpower/hours available to build such a network any time soon. But, as the saying goes - a thousand mile journey starts with a single step. The only goal I have determination to achieve is to become a better Rust architect/developer. 
