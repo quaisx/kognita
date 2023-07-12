@@ -1,14 +1,12 @@
 [package]
-name = "kognita"
+name = "kognita-p2p"
 version = "0.1.0"
 edition = "2021"
-
-[workspace]
-members = ["crates/*"]
+build = "build.rs"
 
 [[bin]]
 name = "kognita-p2p"
-path = "crates/p2p/src/main.rs"
+path = "p2p/src/main.rs"
 bench = false
 doc = false
 test = false
