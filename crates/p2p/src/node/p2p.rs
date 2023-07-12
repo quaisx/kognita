@@ -63,7 +63,7 @@
  use super::super::service::post;
  use super::config;
  
- extern crate pretty_env_logger;
+ //extern crate pretty_env_logger;
 
 // Custom Swarm Network behaviors
 #[derive(NetworkBehaviour)]
