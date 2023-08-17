@@ -2,11 +2,10 @@
 name = "kognita-p2p"
 version = "0.1.0"
 edition = "2021"
-build = "build.rs"
 
 [[bin]]
 name = "kognita-p2p"
-path = "p2p/src/main.rs"
+path = "src/main.rs"
 bench = false
 doc = false
 test = false

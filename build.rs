@@ -34,9 +34,13 @@ use tonic_build;
 
  fn main() -> Result<(), Box<dyn std::error::Error>> {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-    tonic_build::configure()
-        .file_descriptor_set_path(out_dir.join("message"))
-        .compile(&["crates/p2p/proto/message.proto"], &["message"])
-        .unwrap();
+    // tonic_build::configure()
+    //     .file_descriptor_set_path(out_dir.join("message"))
+    //     .compile(&["crates/p2p/model/message.proto"], &["message"])
+    //     .unwrap();
+    // tonic_build::configure()
+    //     .file_descriptor_set_path(out_dir.join("tx"))
+    //     .compile(&["crates/tx/model/tx.proto"], &["tx"])
+    //     .unwrap();
     Ok(())
  }

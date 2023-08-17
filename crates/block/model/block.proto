@@ -1,0 +1,39 @@
+
+syntax = "proto3";
+
+package message;
+
+import "crates/tx/model/tx.proto";
+
+// Block message structure
+// Field	Description	Size
+// Magic no	Data field indicating that this data packet contains a BitcoinSV block. Value always 0xD9B4BEF9	4 bytes
+// Block size	number of bytes remaining in the packet up to end of block	4 bytes
+// Block header	consists of 6 items	80 bytes
+// Transaction counter	positive integer VI = VarInt	1 - 9 bytes
+// Transactions	the (non empty) list of transactions	<Transaction counter>-many transactions
+
+message Block {
+   bytes family = 1;
+   bytes padding = 2;
+   Header header = 3;
+   bytes tx_count = 4;
+   repeated Transaction txs = 6;
+}
+
+// Block Header
+// Field	Purpose	Updated when...	Size (Bytes)
+// Version	Block version		4
+// hashPrevBlock	256-bit hash of the previous block header	A new block comes in	32
+// hashMerkleRoot	256-bit hash based on all of the transactions in the block	An updated merkle tree is completed	32
+// Time	Current block timestamp as seconds since 1970-01-01T00:00 UTC	Every few seconds	4
+// Bits	Current target in compact format	The difficulty is adjusted (approx 2 weeks)	4
+// Nonce	32-bit number (starts at 0)	A hash is tried (increments)	4
+message Header {
+   bytes version = 1;
+   bytes hash_prev_block = 2;
+   bytes hash = 3;
+   bytes timestamp = 4;
+   bytes difficulty = 5;
+   bytes nonce = 6;
+}
