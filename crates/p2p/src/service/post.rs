@@ -15,16 +15,16 @@
 
  */
 
-
 use tonic::{transport::Server, Request, Response, Status};
-use message::message_server::{Message, MessageServer};
+use message::message_server::Message;
+use message::message_server::MessageServer;
 use message::{MessageRequest, MessageResponse};
-use log::{info};
-use tokio::sync::mpsc::{ UnboundedSender};
+use log::info;
+use tokio::sync::mpsc::UnboundedSender;
 use std::sync::Arc;
 use std::sync::Mutex;
-pub mod message {
-    tonic::include_proto!("message");
+mod message {
+    include!(concat!("../model/", "message.rs"));
 }
 
 #[derive(Debug)]

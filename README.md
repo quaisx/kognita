@@ -13,7 +13,8 @@ Server nodes may run as locally so as in the cloud. Make sure the servers are re
 # CURRENT WORK
 1. ~~Add node configuration file to allow nodes to be fine tuned based on the needs and the current state of the network.~~ DONE
 2. ~~Add gRPC service to allow a blockchain or dag component to interact with the node.~~ DONE
-3. *Add transaction injection utility to test the gRPC service and test its performance* - Work in progress... [WASM, YEW, ACTIX-WEB]
+3. ~~Add transaction injection utility to test the gRPC service and test its performance* - Work in progress... [WASM, YEW, ACTIX-WEB]~~ - PARKED FOR NOW
+4. Working defining transaction and block structures, assembling transactions and blocks.
 
 # NOTE
 As part of the latest task scope work, I have refactored the project structure by moving the p2p logic into crates/p2p and adding a web component in crates/web.
