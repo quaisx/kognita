@@ -1,3 +1,8 @@
+mod assembler;
+mod model;
+mod transceiver;
+mod validator;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
