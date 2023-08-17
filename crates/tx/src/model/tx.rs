@@ -21,7 +21,8 @@ pub struct Txin {
 }
 /// Kognita Transaction Out
 /// Field	Description	Size
-/// value	non negative integer giving the number of neutrino(NC/10^9) to be transfered	8 bytes
+/// value	non negative integer giving the number of neutrino(NC:10^8=1KA) to be transfered	8 bytes
+/// 100000000 neutrino coins = 1 Kognita (NC:10^8=1KA)
 /// Txout-script length	non negative integer	1 - 9 bytes VI = VarInt
 /// Txout-script / scriptPubKey	Script	<out-script length>-many bytes
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -47,11 +48,11 @@ pub struct Transaction {
     #[prost(bytes = "vec", tag = "1")]
     pub version: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes = "vec", tag = "2")]
-    pub counter_in: ::prost::alloc::vec::Vec<u8>,
+    pub txs_in_len: ::prost::alloc::vec::Vec<u8>,
     #[prost(message, repeated, tag = "3")]
     pub txs_in: ::prost::alloc::vec::Vec<Txin>,
     #[prost(bytes = "vec", tag = "4")]
-    pub counter_out: ::prost::alloc::vec::Vec<u8>,
+    pub txs_out_len: ::prost::alloc::vec::Vec<u8>,
     #[prost(message, repeated, tag = "5")]
     pub txs_out: ::prost::alloc::vec::Vec<Txout>,
     #[prost(bytes = "vec", tag = "6")]

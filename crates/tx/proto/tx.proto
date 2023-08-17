@@ -2,7 +2,7 @@
 
 syntax = "proto3";
 
-package message;
+package tx;
 
 // Kognita Transaction In 
 // Field	Description	Size
@@ -21,7 +21,8 @@ message Txin {
 
 // Kognita Transaction Out
 // Field	Description	Size
-// value	non negative integer giving the number of neutrino(NC/10^9) to be transfered	8 bytes
+// value	non negative integer giving the number of neutrino(NC:10^8=1KA) to be transfered	8 bytes
+// 100000000 neutrino coins = 1 Kognita (NC:10^8=1KA)
 // Txout-script length	non negative integer	1 - 9 bytes VI = VarInt
 // Txout-script / scriptPubKey	Script	<out-script length>-many bytes
 message Txout {
@@ -42,9 +43,9 @@ message Txout {
 // nLocktime	if non-zero and sequence numbers are < 0xFFFFFFFF: block height or timestamp when transaction is final	4 bytes
 message Transaction {
    bytes version = 1;
-   bytes counter_in = 2;
+   bytes txs_in_len = 2;
    repeated Txin txs_in = 3;
-   bytes counter_out = 4;
+   bytes txs_out_len = 4;
    repeated Txout txs_out = 5;
    bytes nlock = 6;
 }

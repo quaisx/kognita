@@ -17,7 +17,7 @@
 use tonic_build;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-   let proto_file = "model/tx.proto";
+   let proto_file = "proto/tx.proto";
    let out_dir = "./src/model";
    tonic_build::configure()
       .build_server(true)
