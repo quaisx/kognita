@@ -17,12 +17,12 @@
 use tonic_build;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-   let proto_file = "proto/tx.proto";
+   let proto_file = "proto/block.proto";
    let out_dir = "./src/model";
    tonic_build::configure()
       .build_server(true)
       .out_dir(out_dir)
-      .compile(&[proto_file], &["."])
+      .compile(&[proto_file], &[".", "../.."])
       .unwrap_or_else(|e| panic!("protobuf compile error: {}", e));
    println!("cargo:rerun-if-changed={}", proto_file);
    Ok(())
