@@ -7,6 +7,7 @@
     \_|\_\\____/\____\\_/  \|\_/  \_/  \_/ \|                                     
 ```
 
+
 # LATEST UPDATE
 Server nodes may run as locally so as in the cloud. Make sure the servers are reachable from outside. Consult your cloud provider for information how to enable external access.
 
@@ -98,6 +99,7 @@ This is my attempt to write a crypto platform using my previous experience with 
 ## Why RUST for a crypto project?
 Well, I am not stepping into a phylosophical battle which programming language is the best overall. I am a beliver in choosing the right weapon for the right battle. And given my previous experience with crypto projects I think that Rust is an excellent choice for creating a crypto platform that would allow for blasting fast processing of high volumes of microtransactions. Think IoT. Think DAG. Think Markov Chain Monte Carlo. Cryptography. Multihashes. The list goes on...
 The project uses WASM and YEW for the web based UI. 
+All specifications and models are aligned with <a link="https://wiki.bitcoinsv.io/index.php/Main_Page">BitcointSV Wiki</a>
 
 
 ## Expectations and reality

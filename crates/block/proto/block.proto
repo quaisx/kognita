@@ -1,9 +1,9 @@
 
 syntax = "proto3";
 
-package message;
+package block;
 
-import "crates/tx/model/tx.proto";
+import "crates/tx/proto/tx.proto";
 
 // Block message structure
 // Field	Description	Size
@@ -18,7 +18,7 @@ message Block {
    bytes padding = 2;
    Header header = 3;
    bytes tx_count = 4;
-   repeated Transaction txs = 6;
+   repeated tx.Transaction txs = 6;
 }
 
 // Block Header
