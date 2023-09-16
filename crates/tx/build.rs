@@ -1,4 +1,3 @@
-
 /*
  _        _______  _______  _       __________________ _______
 | \    /\(  ___  )(  ____ \( (    /|\__   __/\__   __/(  ___  )
@@ -17,13 +16,14 @@
 use tonic_build;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-   let proto_file = "proto/tx.proto";
-   let out_dir = "./src/model";
-   tonic_build::configure()
-      .build_server(true)
-      .out_dir(out_dir)
-      .compile(&[proto_file], &["."])
-      .unwrap_or_else(|e| panic!("protobuf compile error: {}", e));
-   println!("cargo:rerun-if-changed={}", proto_file);
-   Ok(())
+    let proto_file = "proto/tx.proto";
+    let out_dir = "./src/model";
+    tonic_build::configure()
+        .build_server(true)
+        .out_dir(out_dir)
+        .compile(&[proto_file], &["."])
+        .unwrap_or_else(|e| panic!("protobuf compile error: {}", e));
+    println!("cargo:rerun-if-changed={}", proto_file);
+
+    Ok(())
 }

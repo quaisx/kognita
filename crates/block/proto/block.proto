@@ -12,7 +12,7 @@ import "crates/tx/proto/tx.proto";
 // Block header	consists of 6 items	80 bytes
 // Transaction counter	positive integer VI = VarInt	1 - 9 bytes
 // Transactions	the (non empty) list of transactions	<Transaction counter>-many transactions
-
+// Source ![Block message structure](https://wiki.bitcoinsv.io/index.php/Block#Block_message_structure)
 message Block {
    bytes family = 1;
    bytes padding = 2;
@@ -29,11 +29,13 @@ message Block {
 // Time	Current block timestamp as seconds since 1970-01-01T00:00 UTC	Every few seconds	4
 // Bits	Current target in compact format	The difficulty is adjusted (approx 2 weeks)	4
 // Nonce	32-bit number (starts at 0)	A hash is tried (increments)	4
+// Source ![Block header](https://wiki.bitcoinsv.io/index.php/Block_header)
 message Header {
    bytes version = 1;
    bytes hash_prev_block = 2;
    bytes hash = 3;
-   bytes timestamp = 4;
+   // Block header time stamp ![timestamp](https://wiki.bitcoinsv.io/index.php/Block_timestamp)
+   bytes timestamp = 4; 
    bytes difficulty = 5;
    bytes nonce = 6;
 }
