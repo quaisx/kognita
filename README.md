@@ -6,7 +6,21 @@
     |   \ | \_/|| |_//| | \||| |  | |  | |-||
     \_|\_\\____/\____\\_/  \|\_/  \_/  \_/ \|                                     
 ```
+## TL;DR
+### Bitcoin
+_Bitcoin_ is a peer to peer electronic cash system created by Satoshi Nakamoto. It was first detailed in the Bitcoin Whitepaper in October 2008, and the source code was released in January 2009. The Bitcoin ledger and Blockchain were established with the generation of the Genesis block on the 3rd of January 2009 and the mining of Block 1 six days later on the 9th of January 2009.
 
+Bitcoin allows electronic payments to be sent directly from one party to another, without requiring a central institution or server to process transactions and/or store funds.
+
+The leaderless structure of the network is viewed as a resolution to The Byzantine Generals Problem allowing disconnected entities to follow a common direction without centralized instruction. This solves several issues previously seen as unsolvable in distributed networks, including the problem of preventing Double-spending of coins.
+
+Bitcoin is primarily a payment system which supports peer to peer connection and Instant Transactions. Early in the History of Bitcoin payments required users to understand complicated technical details of Bitcoin's technological underpinnings to make transactions. But developments such as Paymail and Simplified Payment Verification are changing the landscape and making it much easier for users to connect and leverage the blockchain for the back-end of their applications.
+
+Bitcoin also supports the development of application layer protocols which make use of Bitcoin Transactions as a transport layer for information exchange. Several Application layer protocols already exist for BitcoinSV - for more detail see Building on Bitcoin. The Metanet fuses Bitcoin's highly secure and instant sub-cent transactions with onchain data storage and transferability enabling efficient and secure web usage. This will bring forth an Internet of Value where Micropayments become a means to both access and monetize data.
+
+Applications which make use of the immutable nature of the Bitcoin Ledger to store and retrieve data are emerging at an increasing rate. False Return scripts and other scripts that use Pushdata Opcodes to push data into Bitcoin transactions are creating new ways of recording data for public consumption. Bitcoin acts as a timestamp server allowing data to be validated and referenced using transactions.
+
+I am introducing certain variations [Think of the Chaos Theory] to the bitcoin ledger allowing each node to maintain its own state of the truth on the ledger. This implementation should not differ too much from the original inmplementation execept for the parts that allow unlimited number of transactions to be processed and high volumes of blocks to be minted.
 
 # LATEST UPDATE
 Server nodes may run as locally so as in the cloud. Make sure the servers are reachable from outside. Consult your cloud provider for information how to enable external access.
@@ -15,13 +29,13 @@ Server nodes may run as locally so as in the cloud. Make sure the servers are re
 1. ~~Add node configuration file to allow nodes to be fine tuned based on the needs and the current state of the network.~~ DONE
 2. ~~Add gRPC service to allow a blockchain or dag component to interact with the node.~~ DONE
 3. ~~Add transaction injection utility to test the gRPC service and test its performance* - Work in progress... [WASM, YEW, ACTIX-WEB]~~ - PARKED FOR NOW
-4. Working defining transaction and block structures, assembling transactions and blocks.
+4. Working defining transaction, block, and ledger structures, assembling transactions and blocks, building the ledger's DAG (unique order per node, not affecting the tx order in the Merkle tree)
 
 # NOTE
 As part of the latest task scope work, I have refactored the project structure by moving the p2p logic into crates/p2p and adding a web component in crates/web.
 
 
-## DR;TL
+## DR;TL2
 check out kognita https://github.com/quaisx/kognita
 To see the log files: 
 ```bash
