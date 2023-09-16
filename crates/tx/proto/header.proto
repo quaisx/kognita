@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package header;
+// Kognita Block header
+// prev_hash - previous block merkel root hash
+// nonce - a block is found when a miner successfully discovers a value that generates a hash less than the difficulty target
+// root_hash - tx merkel tree root hash
+message Header {
+   bytes prev_hash = 1;
+   bytes nonce = 2;
+   bytes root_hash = 3;
+}
