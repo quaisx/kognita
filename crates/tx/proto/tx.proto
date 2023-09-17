@@ -13,10 +13,10 @@ package tx;
 // sequence_no	normally 0xFFFFFFFF; irrelevant unless transaction's lock_time is > 0	4 bytes
 message Txin {
   bytes prev_hash = 1;
-  bytes prev_idx_out = 2;
+  uint64 prev_idx_out = 2;
   bytes script_length = 3;
   bytes script = 4;
-  bytes sequence_no = 5;
+  uint64 sequence_no = 5;
 }
 
 // Kognita Transaction Out
@@ -26,7 +26,7 @@ message Txin {
 // Txout-script length	non negative integer	1 - 9 bytes VI = VarInt
 // Txout-script / scriptPubKey	Script	<out-script length>-many bytes
 message Txout {
-  bytes neutrinos = 1;
+  uint64 neutrinos = 1;
   bytes script_length = 2;
   bytes script = 3;
 }
@@ -42,10 +42,10 @@ message Txout {
 // list of outputs txs_out qty with variable length per output
 // nLocktime	if non-zero and sequence numbers are < 0xFFFFFFFF: block height or timestamp when transaction is final	4 bytes
 message Transaction {
-   bytes version = 1;
-   bytes txs_in_len = 2;
-   repeated Txin txs_in = 3;
-   bytes txs_out_len = 4;
-   repeated Txout txs_out = 5;
-   bytes nlock = 6;
+  uint32 version = 1;
+  uint64 txs_in_len = 2;
+  repeated Txin txs_in = 3;
+  uint64 txs_out_len = 4;
+  repeated Txout txs_out = 5;
+  uint32 nlock = 6;
 }

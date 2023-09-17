@@ -10,14 +10,14 @@
 pub struct Txin {
     #[prost(bytes = "vec", tag = "1")]
     pub prev_hash: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes = "vec", tag = "2")]
-    pub prev_idx_out: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, tag = "2")]
+    pub prev_idx_out: u64,
     #[prost(bytes = "vec", tag = "3")]
     pub script_length: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes = "vec", tag = "4")]
     pub script: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes = "vec", tag = "5")]
-    pub sequence_no: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, tag = "5")]
+    pub sequence_no: u64,
 }
 /// Kognita Transaction Out
 /// Field	Description	Size
@@ -28,8 +28,8 @@ pub struct Txin {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Txout {
-    #[prost(bytes = "vec", tag = "1")]
-    pub neutrinos: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, tag = "1")]
+    pub neutrinos: u64,
     #[prost(bytes = "vec", tag = "2")]
     pub script_length: ::prost::alloc::vec::Vec<u8>,
     #[prost(bytes = "vec", tag = "3")]
@@ -45,16 +45,16 @@ pub struct Txout {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Transaction {
-    #[prost(bytes = "vec", tag = "1")]
-    pub version: ::prost::alloc::vec::Vec<u8>,
-    #[prost(bytes = "vec", tag = "2")]
-    pub txs_in_len: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint32, tag = "1")]
+    pub version: u32,
+    #[prost(uint64, tag = "2")]
+    pub txs_in_len: u64,
     #[prost(message, repeated, tag = "3")]
     pub txs_in: ::prost::alloc::vec::Vec<Txin>,
-    #[prost(bytes = "vec", tag = "4")]
-    pub txs_out_len: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint64, tag = "4")]
+    pub txs_out_len: u64,
     #[prost(message, repeated, tag = "5")]
     pub txs_out: ::prost::alloc::vec::Vec<Txout>,
-    #[prost(bytes = "vec", tag = "6")]
-    pub nlock: ::prost::alloc::vec::Vec<u8>,
+    #[prost(uint32, tag = "6")]
+    pub nlock: u32,
 }

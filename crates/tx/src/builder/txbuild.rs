@@ -47,12 +47,12 @@ impl TxBuilder {
 
     pub fn build(self) -> Transaction {
         Transaction { 
-            version: Vec::new(), 
-            txs_in_len: Vec::new(), 
+            version: 0, 
+            txs_in_len: 0, 
             txs_in: Vec::new(), 
-            txs_out_len: Vec::new(), 
+            txs_out_len: 0, 
             txs_out: Vec::new(), 
-            nlock: Vec::new() }
+            nlock: 0 }
     }
 }
 
@@ -63,12 +63,12 @@ mod tests {
     #[test]
     fn builder_test() {
         let tx = Transaction { 
-            version: Vec::new(), 
-            txs_in_len: Vec::new(), 
+            version: 0, 
+            txs_in_len: 0, 
             txs_in: Vec::new(), 
-            txs_out_len: Vec::new(), 
+            txs_out_len: 0, 
             txs_out: Vec::new(), 
-            nlock: Vec::new() };
+            nlock: 0 };
         let tx_from_builder: Transaction = TxBuilder::new().set_version(0).build();
         assert_eq!(tx, tx_from_builder);
     }
