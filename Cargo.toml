@@ -41,7 +41,7 @@ test = false
     tiny-keccak = { version = "2.0.2", features = ["sha3"] }
     openssl = { version = "0.10", features = ["vendored"] }
     aes-gcm = "0.10.2"
-    toml = "0.7.4"
+    toml = "0.8.0"
     dirs = "5.0.1"
     tonic = "0.10.0"
     prost = "0.12.0"
