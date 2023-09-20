@@ -14,6 +14,12 @@
 
  */
 
- pub struct Dag {
-   
- }
+pub struct Dag {
+
+}
+
+impl Dag {
+    fn insert(&mut self, ) {
+
+    }
+}

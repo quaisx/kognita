@@ -7,6 +7,10 @@
     \_|\_\\____/\____\\_/  \|\_/  \_/  \_/ \|                                     
 ```
 ## TL;DR
+This is active work in progress and, at times, may not be stable. Currentl work branch is feat/ser [feature/serialization]. Code that compiles
+will be merged into master, but this, in itself, does not offer any guarantee that the node will run. At a later point
+I will come up with a better branch management strategy that is more meaningful for beta testers. As of today, when there are 
+no active beta testers, I will, at will, merge what I consider useful code to master.
 ### Bitcoin
 _Bitcoin_ is a peer to peer electronic cash system created by Satoshi Nakamoto. It was first detailed in the Bitcoin Whitepaper in October 2008, and the source code was released in January 2009. The Bitcoin ledger and Blockchain were established with the generation of the Genesis block on the 3rd of January 2009 and the mining of Block 1 six days later on the 9th of January 2009.
 
