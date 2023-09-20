@@ -15,6 +15,7 @@
  */
 
 use std::time;
+use std::fmt::Display;
 use crate::tx::Transaction;
 use time::timestamp;
 use thiserror::Error;
@@ -35,6 +36,7 @@ use anyhow::{Context, Result};
 ///    Na <--Es-- Nb --Et--> Nc: Node b references Na as its source node, while references
 ///                          Nc as its target node.
 /// Node: we limit the number of edges to the source and target nodes to max 2.
+#[derive(Debug)]
 pub struct Node {
     id: u32,
     timestamp: time::timestamp,
@@ -44,7 +46,7 @@ pub struct Node {
     es: Vec<Rc<Node>>,
 }
 
-impl Node {
+impl Default for Node {
     fn default() -> Self {
         Self {
             id: 0,
@@ -55,11 +57,24 @@ impl Node {
             es: Vec::new(),
         }
     }
+}
+impl Display for Node {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+
+        write!(f, "<Node>")
+    }
+}
+impl Node {
     fn get_tip(&self) -> Result<&mut Node> {
         Ok(Node::default())
     }
-    fn push(&mut self,node: &Node) -> Result<()> {
-        node = self.get_tip().context("Failed to locate a tip for DAG")?;
+    fn push(&mut self, node: &Node) -> Result<()> {
+        tip_node = self.get_tip().context("Failed to locate a tip for DAG")?;
+        tip_node.insert(node).with_context(||{format!("Failed to add node {} as a new tip", node)})?;
+        Ok(())
+    }
+    fn insert(&mut self, node: &Node) -> Result<()> {
+
         Ok(())
     }
 }
