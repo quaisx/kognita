@@ -14,8 +14,11 @@
 
  */
 
+use std::time;
 use crate::tx::Transaction;
 use time::timestamp;
+use thiserror::Error;
+use anyhow::{Context, Result};
 
 /// Node - a tx placeholder inside DAG
 ///    - id: hash of the node with cum. weight = 0; this value will most likely keep changing
@@ -36,7 +39,29 @@ pub struct Node {
     id: u32,
     timestamp: time::timestamp,
     cumweight: u32,
-    tx: Box<Transaction>,
+    tx: Option<Rc<Transaction>>,
     et: Vec<Rc<Node>>,
     es: Vec<Rc<Node>>,
 }
+
+impl Node {
+    fn default() -> Self {
+        Self {
+            id: 0,
+            timestamp: time::SystemTime::timestamp(),
+            cumweight: 0,
+            tx: None,
+            et: Vec::new(),
+            es: Vec::new(),
+        }
+    }
+    fn get_tip(&self) -> Result<&mut Node> {
+        Ok(Node::default())
+    }
+    fn push(&mut self,node: &Node) -> Result<()> {
+        node = self.get_tip().context("Failed to locate a tip for DAG")?;
+        Ok(())
+    }
+}
+
+
