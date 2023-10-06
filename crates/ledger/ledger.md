@@ -20,7 +20,8 @@ The winning Miner creates this special transaction as part of the block templati
 >The sum of the values of all txout's cannot exceed the total of the Miner subsidy and the 
 > mining fees paid by all other transactions included in the block.
 [Source](https://wiki.bitcoinsv.io/index.php/Coinbase)
-<br>
+
+
 ## Chain of Signatures
 
 ![Chain of signatures](img/Chain_of_Signatures.png)
