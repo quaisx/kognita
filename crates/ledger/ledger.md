@@ -22,6 +22,7 @@ The winning Miner creates this special transaction as part of the block templati
 [Source](https://wiki.bitcoinsv.io/index.php/Coinbase)
 <br>
 ## Chain of Signatures
+
 ![Chain of signatures](img/Chain_of_Signatures.png)
 
 Valid transactions that are broadcast on The Bitcoin Network are committed to the ledger by miners in Blocks. A block consists of a header which contains a timestamp, a reference to the block it builds on, a valid Proof of Work and the double SHA-256 hash of the root of a Merkle tree generated with a list of transactions, and the list of transactions. Most nodes use compact block propagation techniques which compress the list of transactions to a much smaller size rather than broadcasting the full block. _Receiving Nodes must decompress the block using a list of validated transactions that they have also compacted._
